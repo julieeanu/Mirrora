@@ -1,15 +1,35 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import Icon from "react-native-vector-icons/Ionicons";
 
-export default function CompleteProfileScreen() {
+// ✅ Font imports (same as VerifyCodeScreen)
+import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
+import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_700Bold } from "@expo-google-fonts/montserrat";
+
+export default function CompleteProfileScreen({ navigation }) {
   const [gender, setGender] = useState("");
+
+  // Load fonts
+  const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold });
+  const [montserratLoaded] = useMontserrat({ Montserrat_400Regular, Montserrat_700Bold });
+
+  if (!leagueSpartanLoaded || !montserratLoaded) {
+    return null; // Could use a loading screen here
+  }
 
   return (
     <View style={styles.container}>
-      {/* Back button */}
-      <TouchableOpacity style={styles.backButton}>
-        <Text style={{ fontSize: 20 }}>←</Text>
+      {/* Back Arrow */}
+      <TouchableOpacity
+        style={[styles.backBtn, styles.backBtnTapArea]}
+        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        onPress={() => {
+          if (navigation?.canGoBack()) navigation.goBack();
+          else navigation.navigate("VerifyCode"); // fallback
+        }}
+      >
+        <Icon name="arrow-back" size={24} color="#000" />
       </TouchableOpacity>
 
       {/* Title */}
@@ -31,14 +51,19 @@ export default function CompleteProfileScreen() {
 
       {/* Name */}
       <Text style={styles.label}>Name</Text>
-      <TextInput style={styles.input} placeholder="John Doe" />
+      <TextInput
+        style={[styles.input, { fontFamily: "Montserrat_400Regular" }]}
+        placeholder="John Doe"
+        placeholderTextColor="#888"
+      />
 
       {/* Phone Number */}
       <Text style={styles.label}>Phone Number</Text>
       <TextInput
-        style={styles.input}
+        style={[styles.input, { fontFamily: "Montserrat_400Regular" }]}
         placeholder="Enter Phone Number"
         keyboardType="phone-pad"
+        placeholderTextColor="#888"
       />
 
       {/* Gender */}
@@ -47,6 +72,7 @@ export default function CompleteProfileScreen() {
         <Picker
           selectedValue={gender}
           onValueChange={(value) => setGender(value)}
+          style={{ fontFamily: "Montserrat_400Regular" }}
         >
           <Picker.Item label="Select" value="" />
           <Picker.Item label="Male" value="male" />
@@ -68,21 +94,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     paddingHorizontal: 25,
-    paddingTop: 40,
+    paddingTop: 80,
   },
-  backButton: {
-    alignSelf: "flex-start",
-    marginBottom: 15,
+  backBtn: {
+    position: "absolute",
+    top: 80,
+    left: 30,
   },
   title: {
+    fontFamily: "LeagueSpartan_700Bold",
     fontSize: 22,
-    fontWeight: "bold",
-    color: "#000",
     textAlign: "center",
+    marginBottom: 15,
   },
   subtitle: {
+    fontFamily: "Montserrat_400Regular",
     fontSize: 14,
-    color: "#777",
+    color: "#555",
     textAlign: "center",
     marginBottom: 25,
     paddingHorizontal: 20,
@@ -106,6 +134,7 @@ const styles = StyleSheet.create({
     padding: 3,
   },
   label: {
+    fontFamily: "Montserrat_400Regular",
     fontSize: 14,
     color: "#000",
     marginBottom: 5,
@@ -118,6 +147,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 15,
     marginBottom: 15,
+    fontSize: 14,
+    color: "#000",
   },
   picker: {
     width: "100%",
@@ -128,17 +159,15 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   button: {
-    width: "100%",
-    height: 50,
-    backgroundColor: "#a67c52",
+    backgroundColor: "#A67B5B",
+    paddingVertical: 15,
     borderRadius: 25,
-    justifyContent: "center",
     alignItems: "center",
     marginTop: 10,
   },
   buttonText: {
+    fontFamily: "Montserrat_700Bold",
     color: "#fff",
     fontSize: 16,
-    fontWeight: "600",
   },
 });
