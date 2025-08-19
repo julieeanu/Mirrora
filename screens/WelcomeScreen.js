@@ -134,6 +134,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     borderRadius: 30,
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 10,
   },
   buttonText: {
     fontFamily: 'Montserrat_600SemiBold',

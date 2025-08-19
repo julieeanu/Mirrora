@@ -1,12 +1,12 @@
 // CreateAccountScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ImageBackground } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import CheckBox from 'expo-checkbox';
 
 // ✅ Font imports
-import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold, LeagueSpartan_400Regular } from "@expo-google-fonts/league-spartan";
-import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_600SemiBold } from "@expo-google-fonts/montserrat";
+import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
+import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_600SemiBold, Montserrat_700Bold } from "@expo-google-fonts/montserrat";
 
 export default function CreateAccountScreen({ navigation }) {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -16,12 +16,12 @@ export default function CreateAccountScreen({ navigation }) {
   // ✅ Load fonts
   const [leagueSpartanLoaded] = useLeagueSpartan({
     LeagueSpartan_700Bold,
-    LeagueSpartan_400Regular,
   });
 
   const [montserratLoaded] = useMontserrat({
     Montserrat_400Regular,
     Montserrat_600SemiBold,
+    Montserrat_700Bold
   });
 
   if (!leagueSpartanLoaded || !montserratLoaded) {
@@ -30,75 +30,82 @@ export default function CreateAccountScreen({ navigation }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Create Account</Text>
-      <Text style={styles.subtitle}>
-        Fill your information below or register with your social account.
-      </Text>
-
-      <TextInput placeholder="Full Name" style={styles.input} />
-      <TextInput placeholder="Email" style={styles.input} keyboardType="email-address" />
-
-      {/* Password */}
-      <View style={styles.passwordContainer}>
-        <TextInput
-          placeholder="Password"
-          secureTextEntry={!passwordVisible}
-          style={styles.passwordInput}
-        />
-        <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-          <Icon name={passwordVisible ? 'eye' : 'eye-off'} size={20} color="#A1866F" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Confirm Password */}
-      <View style={styles.passwordContainer}>
-        <TextInput
-          placeholder="Confirm Password"
-          secureTextEntry={!confirmPasswordVisible}
-          style={styles.passwordInput}
-        />
-        <TouchableOpacity onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}>
-          <Icon name={confirmPasswordVisible ? 'eye' : 'eye-off'} size={20} color="#A1866F" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Terms & Conditions */}
-      <View style={styles.checkboxContainer}>
-        <CheckBox value={isChecked} onValueChange={setChecked} color={isChecked ? '#A1866F' : undefined} />
-        <Text style={styles.checkboxText}>Agree with Terms & Condition</Text>
-      </View>
-
-      {/* Create Account Button */}
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={() => navigation.navigate('VerifyCode')}
+      {/* ✅ Background top section */}
+      <ImageBackground 
+        source={require("../assets/header-bg.png")}
+        style={styles.headerBg}
+        resizeMode="cover"
       >
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
+        <Text style={styles.title}>Create Account</Text>
+        <Text style={styles.subtitle}>Fill your information below</Text>
+      </ImageBackground>
 
-      {/* Or sign up with */}
-      <View style={styles.orContainer}>
-        <View style={styles.line} />
-        <Text style={styles.orText}>Or sign up with</Text>
-        <View style={styles.line} />
-      </View>
+      {/* ✅ Inputs */}
+      <View style={styles.formContainer}>
+        
+        {/* Full Name */}
+        <View style={styles.inputContainer}>
+          <Icon name="person-outline" size={20} color="#A1866F" style={styles.icon} />
+          <TextInput placeholder="Full Name" style={styles.textInput} />
+        </View>
 
-      {/* Social Buttons */}
-      <View style={styles.socialContainer}>
-        <TouchableOpacity style={styles.socialButton}>
-          <Image source={require('../assets/google.png')} style={styles.socialIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.socialButton}>
-          <Image source={require('../assets/facebook.png')} style={styles.socialIcon} />
-        </TouchableOpacity>
-      </View>
+        {/* Email */}
+        <View style={styles.inputContainer}>
+          <Icon name="mail-outline" size={20} color="#A1866F" style={styles.icon} />
+          <TextInput placeholder="Email" style={styles.textInput} keyboardType="email-address" />
+        </View>
 
-      {/* Sign In Link */}
-      <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
-        <Text style={styles.link}>Already have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
-          <Text style={styles.signInLink}>Sign In</Text>
+        {/* Password */}
+        <View style={styles.inputContainer}>
+          <Icon name="lock-closed-outline" size={20} color="#A1866F" style={styles.icon} />
+          <TextInput
+            placeholder="Password"
+            secureTextEntry={!passwordVisible}
+            style={styles.textInput}
+          />
+          <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+            <Icon name={passwordVisible ? 'eye' : 'eye-off'} size={20} color="#A1866F" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Confirm Password */}
+        <View style={styles.inputContainer}>
+          <Icon name="lock-closed-outline" size={20} color="#A1866F" style={styles.icon} />
+          <TextInput
+            placeholder="Confirm Password"
+            secureTextEntry={!confirmPasswordVisible}
+            style={styles.textInput}
+          />
+          <TouchableOpacity onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}>
+            <Icon name={confirmPasswordVisible ? 'eye' : 'eye-off'} size={20} color="#A1866F" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Terms & Conditions */}
+        <View style={styles.checkboxContainer}>
+          <CheckBox 
+            value={isChecked} 
+            onValueChange={setChecked} 
+            color={isChecked ? '#A1866F' : undefined} 
+          />
+          <Text style={styles.checkboxText}>Agree with Terms & Condition</Text>
+        </View>
+
+        {/* Create Account Button */}
+        <TouchableOpacity 
+          style={styles.button} 
+          onPress={() => navigation.navigate('VerifyCode')}
+        >
+          <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
+
+        {/* Sign In Link */}
+        <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
+          <Text style={styles.link}>Already have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
+            <Text style={styles.signInLink}>Sign In</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );
@@ -107,42 +114,43 @@ export default function CreateAccountScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 40,
     backgroundColor: '#fff',
   },
+  headerBg: {
+    width: "100%",
+    height: 280, // lowered header
+    justifyContent: "flex-end",
+    alignItems: "center",
+    paddingBottom: 25,
+  },
   title: {
-    fontSize: 30,
+    fontSize: 28,
     fontFamily: 'LeagueSpartan_700Bold',
     color: '#000',
-    textAlign: 'center',
   },
   subtitle: {
     fontSize: 15,
     fontFamily: 'Montserrat_400Regular',
     color: "gray",
-    textAlign: 'center',
-    marginVertical: 10,
+    marginTop: 5,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#727272',
-    borderRadius: 8,
-    padding: 10,
-    marginTop: 15,
-    fontFamily: 'Montserrat_400Regular',
+  formContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
   },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 1,
-    borderColor: '#727272',
+    borderColor: "#727272",
     borderRadius: 8,
     paddingHorizontal: 10,
     marginTop: 15,
   },
-  passwordInput: {
+  icon: {
+    marginRight: 8,
+  },
+  textInput: {
     flex: 1,
     paddingVertical: 10,
     fontFamily: 'Montserrat_400Regular',
@@ -164,47 +172,20 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: 'center',
     marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 10,
   },
   buttonText: {
     color: '#fff',
     fontSize: 18,
     fontFamily: 'Montserrat_600SemiBold',
   },
-  orContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "95%",
-    alignSelf: "center",
-    marginBottom: 20,
-    gap: 10,
-  },
-  line: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#ccc",
-  },
-  orText: {
-    textAlign: 'center',
-    fontFamily: 'Montserrat_400Regular',
-    color: '#555',
-    marginVertical: 15,
-  },
-  socialContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 20,
-  },
-  socialButton: {
-    marginHorizontal: 10,
-  },
-  socialIcon: {
-    width: 60,
-    height: 60,
-    resizeMode: 'contain',
-  },
   link: {
     fontFamily: 'Montserrat_400Regular',
-    color: '#333',
+    color: 'black',
   },
   signInLink: {
     color: '#7a5c3d',

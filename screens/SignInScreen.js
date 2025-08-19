@@ -3,15 +3,15 @@ import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "reac
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
 
-// ✅ Import Montserrat and League Spartan like Create Account screen
+// ✅ Import Montserrat and League Spartan
 import {
   useFonts as useMontserrat,
   Montserrat_400Regular,
-  Montserrat_700Bold
+  Montserrat_700Bold,
 } from "@expo-google-fonts/montserrat";
 import {
   useFonts as useLeagueSpartan,
-  LeagueSpartan_700Bold
+  LeagueSpartan_700Bold,
 } from "@expo-google-fonts/league-spartan";
 
 export default function SignInScreen() {
@@ -38,19 +38,23 @@ export default function SignInScreen() {
 
       {/* Title */}
       <Text style={styles.title}>Sign In</Text>
-      <Text style={styles.subtitle}>
-        Hi! Welcome back, you’ve been missed
-      </Text>
+      <Text style={styles.subtitle}>Hi! Welcome back, you’ve been missed</Text>
 
-      {/* Email */}
-      <Text style={styles.label}>Email</Text>
-      <TextInput style={styles.input} placeholder="example@gmail.com" />
-
-      {/* Password with Eye-off */}
-      <Text style={styles.label}>Password</Text>
-      <View style={styles.passwordContainer}>
+      {/* Email with Icon */}
+      <View style={styles.inputContainer}>
+        <Ionicons name="mail-outline" size={20} color="gray" style={styles.icon} />
         <TextInput
-          style={styles.passwordInput}
+          style={styles.inputField}
+          placeholder="example@gmail.com"
+          keyboardType="email-address"
+        />
+      </View>
+
+      {/* Password with Icon + Eye toggle */}
+      <View style={styles.inputContainer}>
+        <Ionicons name="lock-closed-outline" size={20} color="gray" style={styles.icon} />
+        <TextInput
+          style={styles.inputField}
           placeholder="Password"
           secureTextEntry={!passwordVisible}
         />
@@ -76,23 +80,8 @@ export default function SignInScreen() {
         <Text style={styles.signInText}>Sign In</Text>
       </TouchableOpacity>
 
-      {/* Or sign in with */}
-      <View style={styles.orContainer}>
-        <View style={styles.line} />
-        <Text style={styles.orText}>Or sign in with</Text>
-        <View style={styles.line} />
-      </View>
-      <View style={styles.socialContainer}>
-        <TouchableOpacity>
-          <Image source={require("../assets/google.png")} style={styles.icon} />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Image source={require("../assets/facebook.png")} style={styles.icon} />
-        </TouchableOpacity>
-      </View>
-
       {/* Sign Up Link */}
-      <Text style={styles.signupText}>
+      <Text style={[styles.signupText, { color: "black" }]}>
         Don’t have an account?{" "}
         <Text
           style={[styles.signupLink, { textDecorationLine: "underline" }]}
@@ -113,13 +102,13 @@ const styles = StyleSheet.create({
   },
   topImage: {
     width: "100%",
-    height: 250,
+    height: 300,
     resizeMode: "cover",
   },
   title: {
     fontSize: 30,
     fontFamily: "LeagueSpartan_700Bold",
-    marginTop: -30,
+    marginTop: -80,
   },
   subtitle: {
     fontSize: 15,
@@ -128,24 +117,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     marginTop: 10,
   },
-  label: {
-    width: "85%",
-    fontSize: 14,
-    fontFamily: "Montserrat_700Bold",
-    marginBottom: 5,
-    color: "#333",
-  },
-  input: {
-    width: "85%",
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#727272",
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    fontFamily: "Montserrat_400Regular",
-  },
-  passwordContainer: {
+  inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     width: "85%",
@@ -155,9 +127,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     marginBottom: 15,
-    justifyContent: "space-between",
   },
-  passwordInput: {
+  icon: {
+    marginRight: 10,
+  },
+  inputField: {
     flex: 1,
     fontFamily: "Montserrat_400Regular",
   },
@@ -177,41 +151,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 25,
     marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 10,
   },
   signInText: {
     color: "#fff",
     fontSize: 18,
     fontFamily: "Montserrat_700Bold",
   },
-  orText: {
-    color: "gray",
-    marginBottom: -2,
-    marginHorizontal: 15,
-    fontFamily: "Montserrat_400Regular",
-  },
-  orContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "85%",
-    marginBottom: 30,
-  },
-  line: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#ccc",
-  },
-  socialContainer: {
-    flexDirection: "row",
-    gap: 20,
-    marginBottom: 30,
-  },
-  icon: {
-    width: 60,
-    height: 60,
-    resizeMode: "contain",
-  },
   signupText: {
-    color: "gray",
     fontFamily: "Montserrat_400Regular",
   },
   signupLink: {
