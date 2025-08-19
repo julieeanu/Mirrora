@@ -103,9 +103,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: "LeagueSpartan_700Bold",
-    fontSize: 22,
+    fontSize: 30,
     textAlign: "center",
     marginBottom: 15,
+    marginTop: -5,
+    marginLeft: 20,
   },
   subtitle: {
     fontFamily: "Montserrat_400Regular",
@@ -114,6 +116,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 25,
     paddingHorizontal: 20,
+    marginLeft: 10,
   },
   profilePicContainer: {
     alignItems: "center",
@@ -168,6 +171,6 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: "Montserrat_700Bold",
     color: "#fff",
-    fontSize: 16,
+    fontSize: 18,
   },
 });

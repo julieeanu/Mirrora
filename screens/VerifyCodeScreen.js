@@ -96,14 +96,15 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: "LeagueSpartan_700Bold",
-    fontSize: 22,
+    fontSize: 30,
     textAlign: "center",
     marginBottom: 20,
+    marginTop: -10,
   },
   subtitle: {
     fontFamily: "Montserrat_400Regular",
-    fontSize: 14,
-    color: "#555",
+    fontSize: 15,
+    color: "gray",
     textAlign: "center",
     marginBottom: 20,
   },
@@ -139,6 +140,7 @@ const styles = StyleSheet.create({
   resendLink: {
     fontFamily: "Montserrat_700Bold",
     color: "#A67B5B",
+    textDecorationLine: "underline",
   },
   verifyButton: {
     backgroundColor: "#A67B5B",

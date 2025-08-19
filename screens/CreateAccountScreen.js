@@ -119,9 +119,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: 'Montserrat_400Regular',
-    color: '#555',
+    color: "gray",
     textAlign: 'center',
     marginVertical: 10,
   },
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: 'Montserrat_600SemiBold',
   },
   orContainer: {

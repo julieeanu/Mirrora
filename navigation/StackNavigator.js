@@ -8,6 +8,8 @@ import SignInScreen from "../screens/SignInScreen";
 import CreateAccountScreen from '../screens/CreateAccountScreen';
 import VerifyCodeScreen from '../screens/VerifyCodeScreen'; 
 import CompleteProfileScreen from "../screens/CompleteProfileScreen";
+import NewPasswordScreen from "../screens/NewPasswordScreen"; 
+import HomeScreen from '../screens/HomeScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +25,8 @@ export default function StackNavigator() {
       <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
       <Stack.Screen name="VerifyCode" component={VerifyCodeScreen} />
       <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} />
+      <Stack.Screen name="NewPassword" component={NewPasswordScreen} />
+      <Stack.Screen name="Home" component={HomeScreen} />
     </Stack.Navigator>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { useNavigation } from "@react-navigation/native"; // ✅ Added
+import { useNavigation } from "@react-navigation/native";
 
 // ✅ Import Montserrat and League Spartan like Create Account screen
 import {
@@ -16,7 +16,7 @@ import {
 
 export default function SignInScreen() {
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const navigation = useNavigation(); // ✅ Added
+  const navigation = useNavigation();
 
   // ✅ Load fonts
   const [montserratLoaded] = useMontserrat({
@@ -64,12 +64,15 @@ export default function SignInScreen() {
       </View>
 
       {/* Forgot Password */}
-      <TouchableOpacity onPress={() => console.log("Forgot password pressed")}>
+      <TouchableOpacity onPress={() => navigation.navigate("NewPassword")}>
         <Text style={styles.forgotText}>Forgot Password?</Text>
       </TouchableOpacity>
 
       {/* Sign In Button */}
-      <TouchableOpacity style={styles.signInButton}>
+      <TouchableOpacity
+        style={styles.signInButton}
+        onPress={() => navigation.navigate("Home")} // ✅ Navigates to Home
+      >
         <Text style={styles.signInText}>Sign In</Text>
       </TouchableOpacity>
 
@@ -92,8 +95,8 @@ export default function SignInScreen() {
       <Text style={styles.signupText}>
         Don’t have an account?{" "}
         <Text
-          style={[styles.signupLink, { textDecorationLine: "underline" }]} // ✅ underline
-          onPress={() => navigation.navigate("CreateAccount")} // ✅ navigate
+          style={[styles.signupLink, { textDecorationLine: "underline" }]}
+          onPress={() => navigation.navigate("CreateAccount")}
         >
           Sign Up
         </Text>
@@ -114,16 +117,16 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   title: {
-    fontSize: 32,
+    fontSize: 30,
     fontFamily: "LeagueSpartan_700Bold",
     marginTop: -30,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     color: "gray",
     fontFamily: "Montserrat_400Regular",
     marginBottom: 30,
-    marginTop: 25,
+    marginTop: 10,
   },
   label: {
     width: "85%",
@@ -177,7 +180,7 @@ const styles = StyleSheet.create({
   },
   signInText: {
     color: "#fff",
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: "Montserrat_700Bold",
   },
   orText: {
