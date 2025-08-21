@@ -1,7 +1,8 @@
 // CreateAccountScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ImageBackground } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+// Replaced Ionicons with MaterialCommunityIcons to access the lock-check icon
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CheckBox from 'expo-checkbox';
 
 // ✅ Font imports
@@ -45,39 +46,40 @@ export default function CreateAccountScreen({ navigation }) {
         
         {/* Full Name */}
         <View style={styles.inputContainer}>
-          <Icon name="person-outline" size={20} color="#A1866F" style={styles.icon} />
+          <Icon name="account-outline" size={20} color="#A1866F" style={styles.icon} />
           <TextInput placeholder="Full Name" style={styles.textInput} />
         </View>
 
         {/* Email */}
         <View style={styles.inputContainer}>
-          <Icon name="mail-outline" size={20} color="#A1866F" style={styles.icon} />
+          <Icon name="email-outline" size={20} color="#A1866F" style={styles.icon} />
           <TextInput placeholder="Email" style={styles.textInput} keyboardType="email-address" />
         </View>
 
         {/* Password */}
         <View style={styles.inputContainer}>
-          <Icon name="lock-closed-outline" size={20} color="#A1866F" style={styles.icon} />
+          <Icon name="lock-outline" size={20} color="#A1866F" style={styles.icon} />
           <TextInput
             placeholder="Password"
             secureTextEntry={!passwordVisible}
             style={styles.textInput}
           />
           <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-            <Icon name={passwordVisible ? 'eye' : 'eye-off'} size={20} color="#A1866F" />
+            <Icon name={passwordVisible ? 'eye-outline' : 'eye-off-outline'} size={20} color="#A1866F" />
           </TouchableOpacity>
         </View>
 
         {/* Confirm Password */}
         <View style={styles.inputContainer}>
-          <Icon name="lock-closed-outline" size={20} color="#A1866F" style={styles.icon} />
+          {/* Using lock-check-outline from MaterialCommunityIcons */}
+          <Icon name="lock-check-outline" size={20} color="#A1866F" style={styles.icon} />
           <TextInput
             placeholder="Confirm Password"
             secureTextEntry={!confirmPasswordVisible}
             style={styles.textInput}
           />
           <TouchableOpacity onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}>
-            <Icon name={confirmPasswordVisible ? 'eye' : 'eye-off'} size={20} color="#A1866F" />
+            <Icon name={confirmPasswordVisible ? 'eye-outline' : 'eye-off-outline'} size={20} color="#A1866F" />
           </TouchableOpacity>
         </View>
 
@@ -88,13 +90,16 @@ export default function CreateAccountScreen({ navigation }) {
             onValueChange={setChecked} 
             color={isChecked ? '#A1866F' : undefined} 
           />
-          <Text style={styles.checkboxText}>Agree with Terms & Condition</Text>
+          <View style={{flexDirection: 'row'}}>
+            <Text style={styles.agreeWithText}>Agree with </Text>
+            <Text style={styles.termsAndConditionText}>Terms & Condition</Text>
+          </View>
         </View>
 
         {/* Create Account Button */}
         <TouchableOpacity 
           style={styles.button} 
-          onPress={() => navigation.navigate('VerifyCode')}
+          onPress={() => navigation.navigate('HomeScreen')} // Changed navigation destination here
         >
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
@@ -141,8 +146,14 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#727272",
+    borderWidth: 1,              
+    borderColor: "#727272",      
+    backgroundColor: "#FFFFFF",  
+    shadowColor: "#000", 
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
     borderRadius: 8,
     paddingHorizontal: 10,
     marginTop: 15,
@@ -160,8 +171,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 15,
   },
-  checkboxText: {
-    marginLeft: 8,
+  // Adjusted font size for "Agree with"
+  agreeWithText: {
+    color: '#000',
+    fontSize: 14,
+    fontFamily: 'Montserrat_400Regular',
+    paddingLeft: 10,
+  },
+  // Updated style for "Terms & Condition"
+  termsAndConditionText: {
     color: '#A68B69',
     fontFamily: 'Montserrat_400Regular',
     textDecorationLine: "underline"

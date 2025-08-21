@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
+// Changing import from Ionicons to MaterialCommunityIcons for consistency
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 // ✅ Fonts (matching your other screens)
 import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
@@ -21,15 +22,6 @@ export default function NewPasswordScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Back Arrow */}
-      <TouchableOpacity
-        style={styles.backBtn}
-        onPress={() => navigation.goBack()}
-        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-      >
-        <Icon name="arrow-back" size={24} color="#000" />
-      </TouchableOpacity>
-
       {/* Title */}
       <Text style={styles.title}>New Password</Text>
       <Text style={styles.subtitle}>
@@ -39,6 +31,8 @@ export default function NewPasswordScreen({ navigation }) {
       {/* Password Input */}
       <Text style={styles.label}>Password</Text>
       <View style={styles.inputContainer}>
+        {/* Changed icon and color to match other screens */}
+        <Icon name="lock-outline" size={20} color="#A1866F" style={styles.icon} />
         <TextInput
           style={[styles.input, { fontFamily: "Montserrat_400Regular" }]}
           secureTextEntry={!showPassword}
@@ -49,9 +43,9 @@ export default function NewPasswordScreen({ navigation }) {
         />
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
           <Icon
-            name={showPassword ? "eye" : "eye-off"}
+            name={showPassword ? "eye-outline" : "eye-off-outline"}
             size={20}
-            color="#777"
+            color="#A1866F"
           />
         </TouchableOpacity>
       </View>
@@ -59,6 +53,8 @@ export default function NewPasswordScreen({ navigation }) {
       {/* Confirm Password Input */}
       <Text style={styles.label}>Confirm Password</Text>
       <View style={styles.inputContainer}>
+        {/* Changed icon and color to match other screens */}
+        <Icon name="lock-check-outline" size={20} color="#A1866F" style={styles.icon} />
         <TextInput
           style={[styles.input, { fontFamily: "Montserrat_400Regular" }]}
           secureTextEntry={!showConfirmPassword}
@@ -69,9 +65,9 @@ export default function NewPasswordScreen({ navigation }) {
         />
         <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
           <Icon
-            name={showConfirmPassword ? "eye" : "eye-off"}
+            name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
             size={20}
-            color="#777"
+            color="#A1866F"
           />
         </TouchableOpacity>
       </View>
@@ -90,11 +86,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     paddingHorizontal: 25,
     paddingTop: 80,
-  },
-  backBtn: {
-    position: "absolute",
-    top: 80,
-    left: 30,
   },
   title: {
     fontFamily: "LeagueSpartan_700Bold",
@@ -120,17 +111,29 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
+    backgroundColor: "#FFFFFF",   // ✅ white background
+    borderWidth: 1,               // ✅ border stroke
+    borderColor: "#727272",       // ✅ stroke color
+    borderRadius: 8,
     paddingHorizontal: 15,
     marginBottom: 15,
+    // optional: keep shadow or remove (I left it here, you can delete if not needed)
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
   },
   input: {
     flex: 1,
     height: 50,
     fontSize: 14,
     color: "#000",
+    // Added padding to match other screens
+    paddingVertical: 10,
+  },
+  icon: {
+    marginRight: 10,
   },
   button: {
     backgroundColor: "#A67B5B",
@@ -138,6 +141,12 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     alignItems: "center",
     marginTop: 20,
+    // Added drop shadow to the button
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 10,
   },
   buttonText: {
     fontFamily: "Montserrat_700Bold",

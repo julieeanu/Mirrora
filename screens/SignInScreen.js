@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
+// Changing import from Ionicons to MaterialCommunityIcons
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
 
 // ✅ Import Montserrat and League Spartan
@@ -42,7 +43,8 @@ export default function SignInScreen() {
 
       {/* Email with Icon */}
       <View style={styles.inputContainer}>
-        <Ionicons name="mail-outline" size={20} color="gray" style={styles.icon} />
+        {/* Changed icon and color to match CreateAccountScreen */}
+        <Icon name="email-outline" size={20} color="#A1866F" style={styles.icon} />
         <TextInput
           style={styles.inputField}
           placeholder="example@gmail.com"
@@ -52,17 +54,18 @@ export default function SignInScreen() {
 
       {/* Password with Icon + Eye toggle */}
       <View style={styles.inputContainer}>
-        <Ionicons name="lock-closed-outline" size={20} color="gray" style={styles.icon} />
+        {/* Changed icon and color to match CreateAccountScreen */}
+        <Icon name="lock-outline" size={20} color="#A1866F" style={styles.icon} />
         <TextInput
           style={styles.inputField}
           placeholder="Password"
           secureTextEntry={!passwordVisible}
         />
         <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
-          <Ionicons
-            name={passwordVisible ? "eye" : "eye-off"}
+          <Icon
+            name={passwordVisible ? "eye-outline" : "eye-off-outline"}
             size={22}
-            color="gray"
+            color="#A1866F"
           />
         </TouchableOpacity>
       </View>
@@ -75,7 +78,7 @@ export default function SignInScreen() {
       {/* Sign In Button */}
       <TouchableOpacity
         style={styles.signInButton}
-        onPress={() => navigation.navigate("Home")} // ✅ Navigates to Home
+        onPress={() => navigation.navigate("HomeScreen")} // ✅ Navigates to Home
       >
         <Text style={styles.signInText}>Sign In</Text>
       </TouchableOpacity>
@@ -122,11 +125,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "85%",
     height: 50,
-    borderWidth: 1,
-    borderColor: "#727272",
+    backgroundColor: "#FFFFFF", // Added background color
     borderRadius: 8,
     paddingHorizontal: 10,
     marginBottom: 15,
+    shadowColor: "#000", 
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1, 
+    borderColor: "#727272", 
   },
   icon: {
     marginRight: 10,
