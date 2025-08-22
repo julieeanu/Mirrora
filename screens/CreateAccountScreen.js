@@ -99,7 +99,7 @@ export default function CreateAccountScreen({ navigation }) {
         {/* Create Account Button */}
         <TouchableOpacity 
           style={styles.button} 
-          onPress={() => navigation.navigate('HomeScreen')} // Changed navigation destination here
+          onPress={() => navigation.navigate('Home')} // Changed navigation destination here
         >
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>

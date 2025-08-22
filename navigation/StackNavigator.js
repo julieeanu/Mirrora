@@ -13,6 +13,7 @@ import ProductScreen from '../screens/ProductScreen';
 import WishlistScreen from "../screens/WishlistScreen";
 import MessageScreen from '../screens/MessageScreen';
 import ChatbotScreen from '../screens/ChatbotScreen';
+import ExploreScreen from "../screens/ExploreScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -28,11 +29,12 @@ export default function StackNavigator() {
       <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
       <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} />
       <Stack.Screen name="NewPassword" component={NewPasswordScreen} />
-      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+      <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="ProductScreen" component={ProductScreen} />
       <Stack.Screen name="Wishlist" component={WishlistScreen} />
       <Stack.Screen name="MessageScreen" component={MessageScreen} />
       <Stack.Screen name="ChatbotScreen" component={ChatbotScreen} />
+      <Stack.Screen name="ExploreScreen" component={ExploreScreen} />
     </Stack.Navigator>
   );
 }

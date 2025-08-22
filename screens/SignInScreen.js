@@ -78,7 +78,7 @@ export default function SignInScreen() {
       {/* Sign In Button */}
       <TouchableOpacity
         style={styles.signInButton}
-        onPress={() => navigation.navigate("HomeScreen")} // ✅ Navigates to Home
+        onPress={() => navigation.navigate("Home")} // ✅ Navigates to Home
       >
         <Text style={styles.signInText}>Sign In</Text>
       </TouchableOpacity>

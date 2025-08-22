@@ -9,10 +9,10 @@ const BottomNavigationBar = ({ navigation }) => {
 
   const navItems = [
     { name: 'home', icon: 'home-outline', activeIcon: 'home', screen: 'Home' },
-    { name: 'categories', icon: 'grid-outline', activeIcon: 'grid', screen: 'Categories' },
+    { name: 'categories', icon: 'grid-outline', activeIcon: 'grid', screen: 'ExploreScreen' },
     { name: 'wishlist', icon: 'heart-outline', activeIcon: 'heart', screen: 'Wishlist' },
-    { name: 'cart', icon: 'cart-outline', activeIcon: 'cart', screen: 'Cart' },
-    { name: 'account', icon: 'person-outline', activeIcon: 'person', screen: 'Account' },
+    { name: 'cart', icon: 'cart-outline', activeIcon: 'cart', screen: 'CartScreen' },
+    { name: 'account', icon: 'person-outline', activeIcon: 'person', screen: 'AccountScreen' },
   ];
 
   const insets = useSafeAreaInsets();

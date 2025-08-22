@@ -51,7 +51,7 @@ export default function WishlistScreen() {
             <View style={styles.header}>
                 <TouchableOpacity 
                     // Change this line:
-                    onPress={() => navigation.navigate('HomeScreen')} 
+                    onPress={() => navigation.navigate('Home')} 
                     style={styles.iconButton}
                 >
                     <Icon name="chevron-left" size={30} color="#000" />

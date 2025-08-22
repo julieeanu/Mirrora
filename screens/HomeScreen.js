@@ -34,21 +34,12 @@ export default function HomeScreen() {
     }
 
 
-    // Placeholder data for categories
-    const categories = [
-        { id: '1', name: 'Round', image: require('../assets/placeholder_round.png') },
-        { id: '2', name: 'Capsule', image: require('../assets/placeholder_capsule.png') },
-        { id: '3', name: 'Arch', image: require('../assets/placeholder_arch.png') },
-        { id: '4', name: 'Irregular', image: require('../assets/placeholder_irregular.png') },
-        { id: '5', name: 'Grid', image: require('../assets/placeholder_grid.png') },
-    ];
-
     // Placeholder data for products
     const popularProducts = [
-        { id: '1', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png') },
-        { id: '2', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png') },
-        { id: '3', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png') },
-        { id: '4', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png') },
+        { id: '1', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png')},
+        { id: '2', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png')},
+        { id: '3', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png')},
+        { id: '4', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png')},
     ];
     
     // Placeholder images - you should replace these with your actual assets
@@ -125,25 +116,10 @@ export default function HomeScreen() {
                 ))}
             </View>
 
-            {/* Categories Section */}
-            <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Categories</Text>
-            </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryList}>
-                {categories.map(category => (
-                    <TouchableOpacity key={category.id} style={styles.categoryItem}>
-                        <View style={styles.categoryIconContainer}>
-                            <Image source={category.image} style={styles.categoryImage} />
-                        </View>
-                        <Text style={styles.categoryText}>{category.name}</Text>
-                    </TouchableOpacity>
-                ))}
-            </ScrollView>
-
             {/* Most Popular Section Header */}
             <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Most Popular</Text>
-                <TouchableOpacity>
+                <Text style={styles.sectionTitle}>All</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('ExploreScreen', { category: 'Most Popular' })}>
                     <Text style={styles.seeAllText}>See All</Text>
                 </TouchableOpacity>
             </View>
@@ -164,14 +140,18 @@ export default function HomeScreen() {
                         style={styles.productCard} 
                         onPress={() => navigation.navigate('ProductScreen', { product: item })}
                     >
-                        <Image source={item.image} style={styles.productImage} />
+                        <View style={styles.productImageContainer}>
+                            <Image source={item.image} style={styles.productImage} />
+                            <TouchableOpacity style={styles.heartIcon}>
+                                <Icon name="heart-outline" size={20} color="#fff" />
+                            </TouchableOpacity>
+                        </View>
                         <View style={styles.productInfo}>
                             <Text style={styles.productName}>{item.name}</Text>
-                            <Text style={styles.productPrice}>{item.price}</Text>
-                            <View style={styles.productActions}>
-                                <Icon name="heart-outline" size={20} color="#777" />
+                            <View style={styles.priceAndButton}>
+                                <Text style={styles.productPrice}>{item.price}</Text>
                                 <TouchableOpacity style={styles.addToCartButton}>
-                                    <Text style={styles.addToCartText}>Add to Cart</Text>
+                                    <Icon name="plus" size={16} color="#fff" />
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -313,37 +293,6 @@ const styles = StyleSheet.create({
         fontFamily: 'Montserrat_400Regular',
         color: '#A68B69',
     },
-    categoryList: {
-        paddingHorizontal: 10,
-    },
-    categoryItem: {
-        alignItems: 'center',
-        marginHorizontal: 10,
-    },
-    categoryIconContainer: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        backgroundColor: '#B08E77', // Added a background color to the icon container
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-        elevation: 3,
-    },
-    categoryImage: {
-        width: '100%',
-        height: '100%',
-        borderRadius: 30,
-        resizeMode: 'cover',
-    },
-    categoryText: {
-        fontFamily: 'Montserrat_400Regular',
-        fontSize: 12,
-    },
     productRow: {
         justifyContent: 'space-between',
         paddingHorizontal: 15,
@@ -361,10 +310,21 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 3,
     },
+    productImageContainer: {
+        position: 'relative',
+    },
     productImage: {
         width: '100%',
         height: 200,
         resizeMode: 'cover',
+    },
+    heartIcon: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        borderRadius: 15,
+        padding: 5,
     },
     productInfo: {
         padding: 10,
@@ -373,28 +333,21 @@ const styles = StyleSheet.create({
         fontFamily: 'Montserrat_600SemiBold',
         fontSize: 14,
     },
-    productPrice: {
-        fontFamily: 'Montserrat_400Regular',
-        fontSize: 14,
-        color: '#A68B69',
-        marginTop: 5,
-    },
-    productActions: {
+    priceAndButton: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginTop: 10,
     },
+    productPrice: {
+        fontFamily: 'Montserrat_600SemiBold',
+        fontSize: 14,
+        color: '#A68B69',
+    },
     addToCartButton: {
         backgroundColor: '#A68B69',
-        paddingVertical: 5,
-        paddingHorizontal: 10,
+        padding: 8,
         borderRadius: 20,
-    },
-    addToCartText: {
-        fontFamily: 'Montserrat_400Regular',
-        fontSize: 12,
-        color: '#fff',
     },
     bottomNav: {
         flexDirection: 'row',
