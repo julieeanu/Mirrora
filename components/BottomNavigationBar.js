@@ -1,27 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation, useRoute } from '@react-navigation/native'; // Added useRoute
 
-// Add `navigation` as a prop
-const BottomNavigationBar = ({ navigation }) => {
-  const [activeTab, setActiveTab] = useState('home');
+const BottomNavigationBar = () => {
+  const navigation = useNavigation();
+  const route = useRoute(); // Use useRoute to get the current route name
+  const currentRouteName = route.name;
 
   const navItems = [
     { name: 'home', icon: 'home-outline', activeIcon: 'home', screen: 'Home' },
     { name: 'categories', icon: 'grid-outline', activeIcon: 'grid', screen: 'ExploreScreen' },
     { name: 'wishlist', icon: 'heart-outline', activeIcon: 'heart', screen: 'Wishlist' },
     { name: 'cart', icon: 'cart-outline', activeIcon: 'cart', screen: 'CartScreen' },
-    { name: 'account', icon: 'person-outline', activeIcon: 'person', screen: 'AccountScreen' },
+    { name: 'account', icon: 'person-outline', activeIcon: 'person', screen: 'ProfileScreen' },
   ];
 
   const insets = useSafeAreaInsets();
 
-  // Function to handle the press
   const handlePress = (item) => {
-    setActiveTab(item.name);
-    // Navigate if a screen name is defined
-    if (item.screen && navigation) {
+    // Navigate only if the screen is different from the current one
+    if (item.screen && item.screen !== currentRouteName) {
       navigation.navigate(item.screen);
     }
   };
@@ -32,13 +32,13 @@ const BottomNavigationBar = ({ navigation }) => {
         <TouchableOpacity
           key={item.name}
           style={styles.navItem}
-          // Use the new handlePress function
           onPress={() => handlePress(item)}
         >
           <Ionicons
-            name={activeTab === item.name ? item.activeIcon : item.icon}
+            // Check if the current route name matches the item's screen name
+            name={currentRouteName === item.screen ? item.activeIcon : item.icon}
             size={26}
-            color={activeTab === item.name ? '#A68B69' : 'gray'}
+            color={currentRouteName === item.screen ? '#A68B69' : 'gray'}
           />
         </TouchableOpacity>
       ))}

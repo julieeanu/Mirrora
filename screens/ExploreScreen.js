@@ -22,7 +22,7 @@ const BottomNavigationBar = ({ navigation }) => {
     { name: 'categories', icon: 'grid-outline', activeIcon: 'grid', screen: 'ExploreScreen' },
     { name: 'wishlist', icon: 'heart-outline', activeIcon: 'heart', screen: 'Wishlist' },
     { name: 'cart', icon: 'cart-outline', activeIcon: 'cart', screen: 'CartScreen' },
-    { name: 'account', icon: 'person-outline', activeIcon: 'person', screen: 'AccountScreen' },
+    { name: 'account', icon: 'person-outline', activeIcon: 'person', screen: 'ProfileScreen' },
   ];
 
   const insets = useSafeAreaInsets();
@@ -168,7 +168,7 @@ export default function ExploreScreen() {
         renderItem={({ item }) => (
           <TouchableOpacity 
             style={styles.productCard}
-            onPress={() => navigation.navigate('ProductDetail', { product: item })}
+            onPress={() => navigation.navigate('ProductScreen', { product: item })}
           >
             <Image source={item.image} style={styles.productImage} />
             <View style={styles.productInfo}>

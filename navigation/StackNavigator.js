@@ -15,6 +15,10 @@ import MessageScreen from '../screens/MessageScreen';
 import ChatbotScreen from '../screens/ChatbotScreen';
 import ExploreScreen from "../screens/ExploreScreen";
 import CartScreen from "../screens/CartScreen";
+import SellerScreen from "../screens/SellerScreen";
+import ProfileScreen from "../screens/ProfileScreen"; 
+import HelpAndSupportScreen from "../screens/HelpAndSupportScreen"; 
+import CustomizationScreen from "../screens/CustomizationScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -37,6 +41,10 @@ export default function StackNavigator() {
       <Stack.Screen name="ChatbotScreen" component={ChatbotScreen} />
       <Stack.Screen name="ExploreScreen" component={ExploreScreen} />
       <Stack.Screen name="CartScreen" component={CartScreen} /> 
+      <Stack.Screen name="SellerScreen" component={SellerScreen} />
+      <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+      <Stack.Screen name="HelpAndSupportScreen" component={HelpAndSupportScreen} />
+      <Stack.Screen name="CustomizationScreen" component={CustomizationScreen} />
     </Stack.Navigator>
   );
 }

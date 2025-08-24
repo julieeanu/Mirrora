@@ -1,88 +1,60 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, StatusBar, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-
-// Font imports from your existing screens
 import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
 import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_600SemiBold } from "@expo-google-fonts/montserrat";
 
-const { width, height } = Dimensions.get('window');
-
 export default function MessageScreen() {
     const navigation = useNavigation();
-    const [activeTab, setActiveTab] = useState('Chatbot');
 
-    // Load fonts
-    const [leagueSpartanLoaded] = useLeagueSpartan({
-        LeagueSpartan_700Bold,
-    });
-    const [montserratLoaded] = useMontserrat({
-        Montserrat_400Regular,
-        Montserrat_600SemiBold
-    });
+    // Load fonts. The conditional return is safe because the hooks are at the top.
+    const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold, });
+    const [montserratLoaded] = useMontserrat({ Montserrat_400Regular, Montserrat_600SemiBold });
+    
+    // Dummy data for chat conversations. In a real app, this would come from a database.
+    // The list has been updated to contain only a single seller.
+    const [conversations, setConversations] = useState([
+        { id: '1', name: 'Vintage Finds', lastMessage: 'Got it, shipping today!', time: '10:30 AM', avatar: require('../assets/chatbot-avatar.png') },
+        { id: '2', name: 'Client Seller', lastMessage: 'Hello, how can I help you with your order?', time: '11:45 AM', avatar: require('../assets/profileavatar.png') },
+    ]);
+
+    // Helper function to render each conversation item in the FlatList.
+    const renderConversation = ({ item }) => (
+        <TouchableOpacity style={styles.conversationItem} onPress={() => navigation.navigate('ChatbotScreen')}>
+            <Image source={item.avatar} style={styles.avatar} />
+            <View style={styles.conversationDetails}>
+                <Text style={styles.name}>{item.name}</Text>
+                <Text style={styles.lastMessage}>{item.lastMessage}</Text>
+            </View>
+            <Text style={styles.time}>{item.time}</Text>
+        </TouchableOpacity>
+    );
 
     if (!leagueSpartanLoaded || !montserratLoaded) {
-        return null; // Wait for fonts to load
+        return null;
     }
 
     return (
         <View style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor="#B08E77" />
-            
-            {/* Custom Header Section */}
-            <View style={styles.headerContainer}>
-                <View style={styles.headerInner}>
-                    {/* ✅ Back button goes back to HomeScreen */}
-                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                        <Icon name="chevron-left" size={30} color="#fff" />
-                    </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Messages</Text>
-                </View>
+            {/* Header */}
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <Icon name="chevron-left" size={28} color="#000" />
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>Messages</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('WishlistScreen')}>
+                    <Icon name="heart-outline" size={24} color="#000" />
+                </TouchableOpacity>
             </View>
 
-            {/* Main Content Area */}
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                <View style={styles.contentContainer}>
-                    {/* Tab Bar for Chatbot and Seller */}
-                    <View style={styles.tabBar}>
-                        <TouchableOpacity
-                            style={[styles.tabButton, activeTab === 'Chatbot' && styles.activeTab]}
-                            onPress={() => setActiveTab('Chatbot')}
-                        >
-                            <Text style={[styles.tabText, activeTab === 'Chatbot' && styles.activeTabText]}>Chatbot</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={[styles.tabButton, activeTab === 'Seller' && styles.activeTab]}
-                            onPress={() => setActiveTab('Seller')}
-                        >
-                            <Text style={[styles.tabText, activeTab === 'Seller' && styles.activeTabText]}>Seller</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    {/* Conditionally render the message content based on the active tab */}
-                    {activeTab === 'Chatbot' ? (
-                        <TouchableOpacity 
-                            style={styles.chatMessage} 
-                            onPress={() => navigation.navigate('ChatbotScreen')}
-                        >
-                            <Image
-                                source={require('../assets/chatbot-avatar.png')}
-                                style={styles.chatbotAvatar}
-                            />
-                            <View style={styles.messageContent}>
-                                <Text style={styles.senderName}>CHATBOTX00719ZV</Text>
-                                <Text style={styles.messageText}>Hi! Welcome to Mirrora. How can I help you today?</Text>
-                            </View>
-                        </TouchableOpacity>
-                    ) : (
-                        // Display a message when the Seller tab has no messages.
-                        <View style={styles.noMessagesContainer}>
-                            <Text style={styles.noMessagesText}>No messages from seller</Text>
-                        </View>
-                    )}
-                </View>
-            </ScrollView>
+            {/* Conversation List */}
+            <FlatList
+                data={conversations}
+                keyExtractor={item => item.id}
+                renderItem={renderConversation}
+                contentContainerStyle={styles.conversationList}
+            />
         </View>
     );
 }
@@ -90,120 +62,64 @@ export default function MessageScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFF7EC',
+        backgroundColor: '#F9F9F9',
     },
-    headerContainer: {
-        backgroundColor: '#B08E77',
-        paddingTop: Platform.OS === 'ios' ? 70 : 40,
-        paddingBottom: 20,
-        borderBottomLeftRadius: 30,
-        borderBottomRightRadius: 30,
-        overflow: 'hidden',
-    },
-    headerInner: {
+    header: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 20,
+        paddingTop: 50,
+        paddingBottom: 15,
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
     },
-    backButton: { padding: 5 },
     headerTitle: {
         fontFamily: 'LeagueSpartan_700Bold',
         fontSize: 22,
-        color: '#fff',
-        position: 'absolute',
-        left: 0,
-        right: 0,
-        textAlign: 'center',
+        color: '#000',
     },
-    scrollContent: {
-        flexGrow: 1,
+    conversationList: {
+        paddingTop: 10,
+        paddingHorizontal: 20,
     },
-    contentContainer: {
-        flex: 1,
-        backgroundColor: '#fff',
-        marginHorizontal: 15,
-        marginTop: -25,
-        borderRadius: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 5,
-        paddingTop: 30,
-        paddingHorizontal: 15,
-    },
-    tabBar: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        paddingBottom: 10,
-        marginBottom: 20,
-    },
-    tabButton: {
-        flex: 1,
-        alignItems: 'center',
-        paddingVertical: 10,
-    },
-    activeTab: {
-        borderBottomWidth: 2,
-        borderBottomColor: '#B08E77',
-    },
-    tabText: {
-        fontFamily: 'Montserrat_400Regular',
-        fontSize: 16,
-        color: '#777',
-    },
-    activeTabText: {
-        fontFamily: 'Montserrat_600SemiBold',
-        color: '#B08E77',
-    },
-    chatMessage: {
+    conversationItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 10,
-        padding: 15,
         backgroundColor: '#fff',
         borderRadius: 15,
-        borderWidth: 1,
-        borderColor: '#E0E0E0',
+        padding: 15,
+        marginBottom: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        elevation: 5,
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+        elevation: 2,
     },
-    chatbotAvatar: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+    avatar: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
         marginRight: 15,
-        backgroundColor: '#f0f0f0',
     },
-    messageContent: {
+    conversationDetails: {
         flex: 1,
     },
-    senderName: {
+    name: {
         fontFamily: 'Montserrat_600SemiBold',
-        fontSize: 14,
-        color: '#333',
-    },
-    messageText: {
-        fontFamily: 'Montserrat_400Regular',
-        fontSize: 14,
-        color: '#555',
-    },
-    // Styles for the no messages view
-    noMessagesContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: height * 0.5, // Ensure the container takes up space for centering
-    },
-    noMessagesText: {
-        fontFamily: 'Montserrat_400Regular',
         fontSize: 16,
+        color: '#000',
+    },
+    lastMessage: {
+        fontFamily: 'Montserrat_400Regular',
+        fontSize: 14,
         color: '#777',
-        textAlign: 'center',
-        paddingHorizontal: 20,
+        marginTop: 5,
+    },
+    time: {
+        fontFamily: 'Montserrat_400Regular',
+        fontSize: 12,
+        color: '#999',
     },
 });

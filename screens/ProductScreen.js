@@ -1,4 +1,3 @@
-// ProductScreen.js
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -40,7 +39,7 @@ export default function ProductScreen() {
                     <Text style={styles.productPrice}>₱ 2,000</Text>
                     
                     {/* Customization link */}
-                    <TouchableOpacity style={styles.customizeLink}>
+                    <TouchableOpacity style={styles.customizeLink} onPress={() => navigation.navigate('CustomizationScreen')}>
                         <Text style={styles.customizeText}>Customize</Text>
                     </TouchableOpacity>
 
