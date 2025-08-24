@@ -14,6 +14,7 @@ import WishlistScreen from "../screens/WishlistScreen";
 import MessageScreen from '../screens/MessageScreen';
 import ChatbotScreen from '../screens/ChatbotScreen';
 import ExploreScreen from "../screens/ExploreScreen";
+import CartScreen from "../screens/CartScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,7 @@ export default function StackNavigator() {
       <Stack.Screen name="MessageScreen" component={MessageScreen} />
       <Stack.Screen name="ChatbotScreen" component={ChatbotScreen} />
       <Stack.Screen name="ExploreScreen" component={ExploreScreen} />
+      <Stack.Screen name="CartScreen" component={CartScreen} /> 
     </Stack.Navigator>
   );
 }
