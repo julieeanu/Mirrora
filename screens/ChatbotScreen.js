@@ -1,238 +1,277 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, KeyboardAvoidingView, Platform, Image } from 'react-native';
-import { useNavigation } from "@react-navigation/native";
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image, FlatList, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
 import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_600SemiBold } from "@expo-google-fonts/montserrat";
 
-export default function ChatbotScreen() {
-    const navigation = useNavigation();
+const dummyMessages = [
+    { id: '1', sender: 'chatbot', text: 'Hi! Welcome to Mirrora. How can I help you today?', avatar: require('../assets/chatbot-avatar.png'), time: '9:00 AM', date: 'July 2025' },
+    { id: '2', sender: 'user', text: 'Do you have onsite workshop?', time: '9:01 AM' },
+    { id: '3', sender: 'chatbot', text: 'Yes, we are located in Brgy. Bulacao, Cebu City, Philippines. You may visit us to check our mirrors in person or inquire about custom orders.', avatar: require('../assets/chatbot-avatar.png'), time: '9:02 AM' },
+    { id: '4', sender: 'user', text: 'Thank you.', time: '9:03 AM' },
+    { id: '5', sender: 'chatbot', text: 'You\'re welcome! Do you need help with anything else?', avatar: require('../assets/chatbot-avatar.png'), time: '9:04 AM' },
+];
 
-    // Load fonts. The conditional return is safe because the hooks are at the top.
-    const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold, });
-    const [montserratLoaded] = useMontserrat({ Montserrat_400Regular, Montserrat_600SemiBold });
-    
-    // State to hold the chat messages.
-    const [messages, setMessages] = useState([]);
-    // State to hold the text input value.
-    const [inputText, setInputText] = useState("");
-    
+const quickReplies = [
+    'Do you have onsite workshop?',
+    'How much is the delivery fee?',
+    'Do you offer same-day delivery?',
+    'How do I track my order?',
+    'What payment methods are accepted?'
+];
+
+const ChatMessage = ({ item }) => {
+    const isUser = item.sender === 'user';
+    return (
+        <View style={[styles.chatMessageContainer, isUser ? styles.userMessageContainer : styles.chatbotMessageContainer]}>
+            {!isUser && item.avatar && <Image source={item.avatar} style={styles.chatMessageAvatar} />}
+            <View style={[isUser ? styles.userMessageBubble : styles.chatbotMessageBubble, styles.shadow]}>
+                <Text style={isUser ? styles.userMessageText : styles.chatbotMessageText}>{item.text}</Text>
+            </View>
+        </View>
+    );
+};
+
+export default function ChatbotScreen({ onGoBack }) {
+    const [inputMessage, setInputMessage] = useState('');
+    const [messages, setMessages] = useState(dummyMessages);
     const flatListRef = useRef(null);
 
-    // Use an effect to simulate a welcome message from the bot on first load.
-    useEffect(() => {
-        setMessages([
-            {
-                id: '1',
-                text: "Hello! I'm your AI shopping assistant. How can I help you today?",
-                sender: 'bot',
-                timestamp: new Date().toLocaleTimeString(),
-            },
-        ]);
-    }, []);
+    const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold });
+    const [montserratLoaded] = useMontserrat({ Montserrat_400Regular, Montserrat_600SemiBold });
+  
+    if (!leagueSpartanLoaded || !montserratLoaded) {
+      return null;
+    }
 
-    // Function to handle sending a message.
-    const handleSend = () => {
-        if (inputText.trim() === '') {
-            return;
-        }
-
-        const newMessage = {
-            id: String(messages.length + 1),
-            text: inputText,
-            sender: 'user',
-            timestamp: new Date().toLocaleTimeString(),
-        };
-
-        // Add the new message to the end of the array
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-        setInputText("");
-
-        // Simulate a bot response after a short delay.
-        setTimeout(() => {
-            const botResponse = {
-                id: String(messages.length + 2),
-                text: "Thanks for your message! How can I help you further?",
-                sender: 'bot',
-                timestamp: new Date().toLocaleTimeString(),
-            };
-            // Add the bot response to the end of the array
-            setMessages((prevMessages) => [...prevMessages, botResponse]);
-        }, 1000);
+    const handleSendMessage = () => {
+        if (inputMessage.trim() === '') return;
+        const newMessage = { id: Date.now().toString(), sender: 'user', text: inputMessage, time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) };
+        setMessages([...messages, newMessage]);
+        setInputMessage('');
+        flatListRef.current.scrollToEnd({ animated: true });
     };
 
-    // Helper function to render each message in the FlatList.
-    const renderMessage = ({ item }) => {
-        const isUserMessage = item.sender === 'user';
+    const handleQuickReply = (text) => {
+        setInputMessage(text);
+        flatListRef.current.scrollToEnd({ animated: true });
+    };
+
+    const renderItem = ({ item }) => {
+        const isUser = item.sender === 'user';
         return (
-            <View style={[styles.messageContainer, isUserMessage ? styles.userMessage : styles.botMessage]}>
-                {!isUserMessage && (
-                    <Image 
-                        source={require('../assets/chatbot-avatar.png')} 
-                        style={styles.avatar} 
-                    />
-                )}
-                <View style={[styles.messageBubble, isUserMessage ? styles.userBubble : styles.botBubble]}>
-                    <Text style={[styles.messageText, isUserMessage ? styles.userText : styles.botText]}>{item.text}</Text>
-                    <Text style={styles.timestamp}>{item.timestamp}</Text>
+            <View>
+                {item.date && <Text style={styles.dateSeparator}>{item.date}</Text>}
+                <View style={[styles.chatMessageContainer, isUser ? styles.userMessageContainer : styles.chatbotMessageContainer]}>
+                    {!isUser && item.avatar && <Image source={item.avatar} style={styles.chatMessageAvatar} />}
+                    <View style={[isUser ? styles.userMessageBubble : styles.chatbotMessageBubble, styles.shadow]}>
+                        <Text style={isUser ? styles.userMessageText : styles.chatbotMessageText}>{item.text}</Text>
+                    </View>
                 </View>
             </View>
         );
     };
 
-    // Scroll to the end of the FlatList when new messages are added
-     useEffect(() => {
-    if (messages.length > 0 && flatListRef.current) {
-        flatListRef.current.scrollToIndex({
-            index: messages.length - 1,
-            animated: true,
-        });
-    }
-}, [messages]);
-
-    if (!leagueSpartanLoaded || !montserratLoaded) {
-        return null;
-    }
-
     return (
-        <View style={styles.container}>
-            {/* Header */}
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+        >
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Icon name="chevron-left" size={28} color="#000" />
+                <TouchableOpacity onPress={onGoBack} style={styles.backButton}>
+                    <Icon name="chevron-left" size={30} color="#fff" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>AI Assistant</Text>
-                <View style={{ width: 28 }} />
-            </View>
-
-            {/* Chat Messages and Input Area */}
-            <KeyboardAvoidingView
-                style={styles.keyboardAvoidingView}
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-            >
-                <FlatList
-                    ref={flatListRef}
-                    data={messages}
-                    keyExtractor={item => item.id}
-                    renderItem={renderMessage}
-                    contentContainerStyle={styles.messageList}
-                />
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder="Type a message..."
-                        value={inputText}
-                        onChangeText={setInputText}
-                        onSubmitEditing={handleSend}
-                    />
-                    <TouchableOpacity style={styles.sendButton} onPress={handleSend}>
-                        <Icon name="send-circle" size={40} color="#A68B69" />
-                    </TouchableOpacity>
+                <View style={styles.headerTitleContainer}>
+                    <Text style={styles.headerTitle}>Chatbot</Text>
+                    <Text style={styles.headerSubtitle}>Online</Text>
                 </View>
-            </KeyboardAvoidingView>
-        </View>
+                <View style={{ width: 30 }} />
+            </View>
+            <View style={styles.mainContent}>
+                <View style={styles.chatHeader}>
+                    <Text style={styles.chatHeaderTitle}>Hello, Aubrie</Text>
+                    <Text style={styles.chatHeaderSubtitle}>How can I help?</Text>
+                </View>
+                <View style={{flex: 1}}>
+                    <FlatList
+                        ref={flatListRef}
+                        data={messages}
+                        keyExtractor={item => item.id}
+                        renderItem={renderItem}
+                        contentContainerStyle={styles.flatListContent}
+                        onContentSizeChange={() => flatListRef.current.scrollToEnd({ animated: true })}
+                    />
+                </View>
+                <View style={styles.quickRepliesAndInputContainer}>
+                    <ScrollView style={styles.quickRepliesContainer} horizontal showsHorizontalScrollIndicator={false}>
+                        {quickReplies.map((reply, index) => (
+                            <TouchableOpacity key={index} style={styles.quickReplyButton} onPress={() => handleQuickReply(reply)}>
+                                <Text style={styles.quickReplyText}>{reply}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            style={styles.messageInput}
+                            placeholder="Write Message"
+                            placeholderTextColor="#999"
+                            value={inputMessage}
+                            onChangeText={setInputMessage}
+                        />
+                        <TouchableOpacity onPress={handleSendMessage} style={styles.sendButton}>
+                            <Icon name="send" size={24} color="#A68B69" />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </View>
+        </KeyboardAvoidingView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F9F9F9',
+        backgroundColor: '#A68B69',
     },
     header: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 20,
         paddingTop: 50,
         paddingBottom: 15,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+    },
+    backButton: {
+        padding: 5,
+    },
+    headerTitleContainer: {
+        alignItems: 'center',
     },
     headerTitle: {
         fontFamily: 'LeagueSpartan_700Bold',
-        fontSize: 22,
-        color: '#000',
-    },
-    keyboardAvoidingView: {
-        flex: 1,
-    },
-    messageList: {
-        paddingTop: 10,
-        paddingHorizontal: 15,
-    },
-    messageContainer: {
-        flexDirection: 'row',
-        alignItems: 'flex-end',
-        marginVertical: 5,
-    },
-    userMessage: {
-        justifyContent: 'flex-end',
-    },
-    botMessage: {
-        justifyContent: 'flex-start',
-    },
-    avatar: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        marginRight: 8,
-    },
-    messageBubble: {
-        paddingVertical: 10,
-        paddingHorizontal: 15,
-        borderRadius: 20,
-        maxWidth: '75%',
-    },
-    userBubble: {
-        backgroundColor: '#A68B69',
-        borderBottomRightRadius: 5,
-    },
-    botBubble: {
-        backgroundColor: '#fff',
-        borderWidth: 1,
-        borderColor: '#D9D9D9',
-        borderBottomLeftRadius: 5,
-    },
-    messageText: {
-        fontFamily: 'Montserrat_400Regular',
-        fontSize: 16,
-    },
-    userText: {
+        fontSize: 24,
         color: '#fff',
     },
-    botText: {
+    headerSubtitle: {
+        fontFamily: 'Montserrat_400Regular',
+        fontSize: 12,
+        color: '#fff',
+    },
+    mainContent: {
+        flex: 1,
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        marginTop: 10,
+    },
+    chatHeader: {
+        paddingVertical: 20,
+        paddingHorizontal: 20,
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    chatHeaderTitle: {
+        fontFamily: 'LeagueSpartan_700Bold',
+        fontSize: 28,
         color: '#000',
     },
-    timestamp: {
+    chatHeaderSubtitle: {
+        fontFamily: 'Montserrat_600SemiBold',
+        fontSize: 20,
+        color: '#000',
+    },
+    quickRepliesAndInputContainer: {
+        backgroundColor: '#fff',
+    },
+    quickRepliesContainer: {
+        flexDirection: 'row',
+        paddingHorizontal: 15,
+        marginBottom: 10,
+        paddingBottom: 10,
+    },
+    quickReplyButton: {
+        backgroundColor: '#E8E8E8',
+        borderRadius: 20,
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        marginHorizontal: 5,
+    },
+    quickReplyText: {
         fontFamily: 'Montserrat_400Regular',
-        fontSize: 10,
-        color: '#999',
-        textAlign: 'right',
-        marginTop: 5,
+        fontSize: 12,
+        color: '#000',
+    },
+    flatListContent: {
+        paddingHorizontal: 20,
+        paddingBottom: 20,
+    },
+    chatMessageContainer: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginBottom: 15,
+    },
+    chatbotMessageContainer: {
+        justifyContent: 'flex-start',
+    },
+    userMessageContainer: {
+        justifyContent: 'flex-end',
+        flexDirection: 'row',
+    },
+    chatMessageAvatar: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        marginRight: 10,
+    },
+    chatbotMessageBubble: {
+        backgroundColor: '#F3F4F6',
+        borderRadius: 15,
+        padding: 15,
+        maxWidth: '80%',
+    },
+    userMessageBubble: {
+        backgroundColor: '#A68B69',
+        borderRadius: 15,
+        padding: 15,
+        maxWidth: '80%',
+    },
+    chatbotMessageText: {
+        fontFamily: 'Montserrat_400Regular',
+        fontSize: 14,
+        lineHeight: 20,
+        color: '#000',
+    },
+    userMessageText: {
+        fontFamily: 'Montserrat_400Regular',
+        fontSize: 14,
+        lineHeight: 20,
+        color: '#fff',
     },
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 15,
+        paddingHorizontal: 20,
         paddingVertical: 10,
-        backgroundColor: '#fff',
         borderTopWidth: 1,
-        borderTopColor: '#eee',
+        borderTopColor: '#f0f0f0',
     },
-    textInput: {
+    messageInput: {
         flex: 1,
         backgroundColor: '#F3F4F6',
         borderRadius: 25,
+        height: 50,
         paddingHorizontal: 20,
-        paddingVertical: 10,
-        marginRight: 10,
         fontFamily: 'Montserrat_400Regular',
-        fontSize: 16,
     },
     sendButton: {
-        justifyContent: 'center',
-        alignItems: 'center',
+        marginLeft: 10,
+    },
+    shadow: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+        elevation: 2,
     },
 });

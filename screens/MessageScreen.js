@@ -1,60 +1,83 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
 import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_600SemiBold } from "@expo-google-fonts/montserrat";
 
+import ChatbotScreen from './ChatbotScreen'; // Import the new ChatbotScreen component
+
 export default function MessageScreen() {
     const navigation = useNavigation();
+    const [selectedTab, setSelectedTab] = useState('Chatbot');
+    const [showChatbotScreen, setShowChatbotScreen] = useState(false);
 
-    // Load fonts. The conditional return is safe because the hooks are at the top.
-    const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold, });
+    const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold });
     const [montserratLoaded] = useMontserrat({ Montserrat_400Regular, Montserrat_600SemiBold });
-    
-    // Dummy data for chat conversations. In a real app, this would come from a database.
-    // The list has been updated to contain only a single seller.
-    const [conversations, setConversations] = useState([
-        { id: '1', name: 'Vintage Finds', lastMessage: 'Got it, shipping today!', time: '10:30 AM', avatar: require('../assets/chatbot-avatar.png') },
-        { id: '2', name: 'Client Seller', lastMessage: 'Hello, how can I help you with your order?', time: '11:45 AM', avatar: require('../assets/profileavatar.png') },
-    ]);
-
-    // Helper function to render each conversation item in the FlatList.
-    const renderConversation = ({ item }) => (
-        <TouchableOpacity style={styles.conversationItem} onPress={() => navigation.navigate('ChatbotScreen')}>
-            <Image source={item.avatar} style={styles.avatar} />
-            <View style={styles.conversationDetails}>
-                <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.lastMessage}>{item.lastMessage}</Text>
-            </View>
-            <Text style={styles.time}>{item.time}</Text>
-        </TouchableOpacity>
-    );
-
+  
     if (!leagueSpartanLoaded || !montserratLoaded) {
-        return null;
+      return null;
+    }
+
+    const messages = [
+        { id: '1', sender: 'chatbot', text: 'Hi! Welcome to Mirrora. How can I help you today?', username: 'CHATBOTX00719ZV', avatar: require('../assets/chatbot-avatar.png') },
+    ];
+
+    const renderMessage = ({ item }) => {
+        return (
+            <TouchableOpacity onPress={() => setShowChatbotScreen(true)} style={styles.messageCard}>
+                <View style={styles.messageRow}>
+                    <Image source={item.avatar} style={styles.messageAvatar} />
+                    <View style={styles.messageTextContainer}>
+                        <Text style={styles.messageUsername}>{item.username}</Text>
+                        <Text style={styles.messageText}>{item.text}</Text>
+                    </View>
+                </View>
+            </TouchableOpacity>
+        );
+    };
+
+    if (showChatbotScreen) {
+        return <ChatbotScreen navigation={navigation} onGoBack={() => setShowChatbotScreen(false)} />;
     }
 
     return (
         <View style={styles.container}>
-            {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Icon name="chevron-left" size={28} color="#000" />
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <Icon name="chevron-left" size={30} color="#fff" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Messages</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('WishlistScreen')}>
-                    <Icon name="heart-outline" size={24} color="#000" />
-                </TouchableOpacity>
+                <Text style={styles.title}>Messages</Text>
+                <View style={{ width: 30 }} />
             </View>
-
-            {/* Conversation List */}
-            <FlatList
-                data={conversations}
-                keyExtractor={item => item.id}
-                renderItem={renderConversation}
-                contentContainerStyle={styles.conversationList}
-            />
+            <View style={styles.mainContent}>
+                <View style={styles.tabContainer}>
+                    <TouchableOpacity onPress={() => setSelectedTab('Chatbot')} style={styles.tab}>
+                        <Text style={[styles.tabText, selectedTab === 'Chatbot' && styles.activeTabText]}>
+                            Chatbot
+                        </Text>
+                        {selectedTab === 'Chatbot' && <View style={styles.tabIndicator} />}
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => setSelectedTab('Seller')} style={styles.tab}>
+                        <Text style={[styles.tabText, selectedTab === 'Seller' && styles.activeTabText]}>
+                            Seller
+                        </Text>
+                        {selectedTab === 'Seller' && <View style={styles.tabIndicator} />}
+                    </TouchableOpacity>
+                </View>
+                {selectedTab === 'Chatbot' ? (
+                    <FlatList
+                        data={messages}
+                        keyExtractor={(item) => item.id}
+                        renderItem={renderMessage}
+                        contentContainerStyle={{ padding: 20 }}
+                    />
+                ) : (
+                    <View style={styles.noChatContainer}>
+                        <Text style={styles.noChatText}>No seller conversations yet.</Text>
+                    </View>
+                )}
+            </View>
         </View>
     );
 }
@@ -62,64 +85,99 @@ export default function MessageScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F9F9F9',
+        backgroundColor: '#A68B69',
     },
     header: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 20,
         paddingTop: 50,
         paddingBottom: 15,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
     },
-    headerTitle: {
+    backButton: {
+        padding: 5,
+    },
+    title: {
         fontFamily: 'LeagueSpartan_700Bold',
-        fontSize: 22,
+        fontSize: 20,
+        color: '#fff',
+    },
+    mainContent: {
+        flex: 1,
+        backgroundColor: '#fff',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        marginTop: 10,
+    },
+    tabContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginTop: 15,
+    },
+    tab: {
+        alignItems: 'center',
+        flex: 1,
+    },
+    tabText: {
+        fontFamily: 'Montserrat_400Regular',
+        fontSize: 16,
+        color: '#888',
+    },
+    activeTabText: {
+        fontFamily: 'Montserrat_600SemiBold',
         color: '#000',
     },
-    conversationList: {
-        paddingTop: 10,
-        paddingHorizontal: 20,
+    tabIndicator: {
+        marginTop: 4,
+        height: 2,
+        backgroundColor: '#A68B69',
+        width: '60%',
+        borderRadius: 2,
     },
-    conversationItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
+    messageCard: {
         backgroundColor: '#fff',
-        borderRadius: 15,
+        borderRadius: 10,
         padding: 15,
-        marginBottom: 10,
+        marginBottom: 15,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0.1,
         shadowRadius: 3,
         elevation: 2,
     },
-    avatar: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        marginRight: 15,
+    messageRow: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
     },
-    conversationDetails: {
+    messageAvatar: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        marginRight: 10,
+    },
+    messageTextContainer: {
         flex: 1,
     },
-    name: {
+    messageUsername: {
         fontFamily: 'Montserrat_600SemiBold',
-        fontSize: 16,
+        fontSize: 12,
+        marginBottom: 4,
         color: '#000',
     },
-    lastMessage: {
+    messageText: {
         fontFamily: 'Montserrat_400Regular',
         fontSize: 14,
-        color: '#777',
-        marginTop: 5,
+        color: '#444',
     },
-    time: {
+    noChatContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noChatText: {
         fontFamily: 'Montserrat_400Regular',
-        fontSize: 12,
-        color: '#999',
+        fontSize: 16,
+        color: 'gray',
     },
 });

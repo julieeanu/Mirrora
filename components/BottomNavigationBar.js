@@ -2,16 +2,16 @@ import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation, useRoute } from '@react-navigation/native'; // Added useRoute
+import { useNavigation, useNavigationState } from '@react-navigation/native';
 
 const BottomNavigationBar = () => {
   const navigation = useNavigation();
-  const route = useRoute(); // Use useRoute to get the current route name
-  const currentRouteName = route.name;
+  const navigationState = useNavigationState(state => state);
+  const currentRouteName = navigationState?.routes[navigationState.index]?.name;
 
   const navItems = [
     { name: 'home', icon: 'home-outline', activeIcon: 'home', screen: 'Home' },
-    { name: 'categories', icon: 'grid-outline', activeIcon: 'grid', screen: 'ExploreScreen' },
+    { name: 'categories', icon: 'grid-outline', activeIcon: 'grid', screen: 'CategoryScreen' },
     { name: 'wishlist', icon: 'heart-outline', activeIcon: 'heart', screen: 'Wishlist' },
     { name: 'cart', icon: 'cart-outline', activeIcon: 'cart', screen: 'CartScreen' },
     { name: 'account', icon: 'person-outline', activeIcon: 'person', screen: 'ProfileScreen' },

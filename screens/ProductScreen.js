@@ -24,6 +24,7 @@ export default function ProductScreen() {
         <View style={styles.container}>
             {/* Product Image container with the back button */}
             <View style={styles.imageContainer}>
+                {/* Dynamically display the product image */}
                 <Image source={product.image} style={styles.productImage} />
                 <View style={styles.header}>
                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
@@ -35,11 +36,13 @@ export default function ProductScreen() {
             {/* Product Details Section inside a ScrollView */}
             <ScrollView showsVerticalScrollIndicator={false} style={styles.detailsScrollView}>
                 <View style={styles.detailsContainer}>
-                    <Text style={styles.productName}>Floor Standing Mirror</Text>
-                    <Text style={styles.productPrice}>₱ 2,000</Text>
-                    
+                    {/* Dynamically display the product name */}
+                    <Text style={styles.productName}>{product.name}</Text>
+                    {/* Dynamically display the product price */}
+                    <Text style={styles.productPrice}>{product.price}</Text>
+
                     {/* Customization link */}
-                    <TouchableOpacity style={styles.customizeLink} onPress={() => navigation.navigate('CustomizationScreen')}>
+                    <TouchableOpacity style={styles.customizeLink} onPress={() => navigation.navigate('CustomizationScreen', { product: product })}>
                         <Text style={styles.customizeText}>Customize</Text>
                     </TouchableOpacity>
 
@@ -81,7 +84,6 @@ export default function ProductScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // The only change is here
         backgroundColor: '#FFF7EC',
     },
     imageContainer: {

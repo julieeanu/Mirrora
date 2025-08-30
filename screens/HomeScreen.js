@@ -119,7 +119,7 @@ export default function HomeScreen() {
             {/* Most Popular Section Header */}
             <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>All</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('ExploreScreen', { category: 'Most Popular' })}>
+                <TouchableOpacity onPress={() => navigation.navigate('CategoryScreen', { category: 'Most Popular' })}>
                     <Text style={styles.seeAllText}>See All</Text>
                 </TouchableOpacity>
             </View>
