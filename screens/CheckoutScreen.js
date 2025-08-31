@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, FlatList, TextInput } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
@@ -22,17 +22,18 @@ export default function CheckoutScreen() {
         { id: '1', name: 'Floor Standing Mirror', size: "60.2\" x 51.2\"", price: 2000, quantity: 1, image: require('../assets/mirror4.png') },
     ]);
 
+    // State to control the visibility of the new card form
+    const [showNewCardForm, setShowNewCardForm] = useState(false);
+
     if (!leagueSpartanLoaded || !montserratLoaded) {
         return null;
     }
 
     const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const deliveryFee = 0; // Assuming free delivery for this example
+    const deliveryFee = 0;
     const total = subtotal + deliveryFee;
 
-    // New function to handle the "Place Order" button press
     const handlePlaceOrder = () => {
-        // Navigates to the OrderConfirmationScreen
         navigation.navigate('OrderConfirmationScreen');
     };
 
@@ -47,6 +48,43 @@ export default function CheckoutScreen() {
             <Text style={styles.checkoutItemQuantity}>x{item.quantity}</Text>
         </View>
     );
+    
+    // Function to render the new card form
+    const renderNewCardForm = () => {
+        if (!showNewCardForm) {
+            return null;
+        }
+
+        return (
+            <View style={[styles.newCardFormContainer, styles.shadow]}>
+                <Text style={styles.formTitle}>Add New Card</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Card Number"
+                    keyboardType="numeric"
+                />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Cardholder Name"
+                />
+                <View style={styles.inputRow}>
+                    <TextInput
+                        style={[styles.input, styles.inputHalf]}
+                        placeholder="MM/YY"
+                        keyboardType="numeric"
+                    />
+                    <TextInput
+                        style={[styles.input, styles.inputHalf]}
+                        placeholder="CVV"
+                        keyboardType="numeric"
+                    />
+                </View>
+                <TouchableOpacity style={styles.saveCardButton}>
+                    <Text style={styles.saveCardText}>Save Card</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    };
 
     return (
         <View style={styles.container}>
@@ -115,16 +153,22 @@ export default function CheckoutScreen() {
                             <Text style={styles.accountNumber}>********3721</Text>
                         </View>
                     </View>
+                    
+                    {renderNewCardForm()}
 
-                    <TouchableOpacity style={styles.addCardButton}>
-                        <Icon name="plus" size={20} color="#000" />
-                        <Text style={styles.addCardText}>Add new card</Text>
+                    <TouchableOpacity
+                        style={styles.addCardButton}
+                        onPress={() => setShowNewCardForm(!showNewCardForm)}
+                    >
+                        <Icon name="plus-circle-outline" size={24} color="#A68B69" />
+                        <Text style={styles.addCardText}>
+                            {showNewCardForm ? "Hide card form" : "Add new card"}
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
 
             <View style={styles.bottomBar}>
-                {/* Updated TouchableOpacity to call the new function */}
                 <TouchableOpacity style={styles.placeOrderButton} onPress={handlePlaceOrder}>
                     <Text style={styles.placeOrderButtonText}>Place Order</Text>
                 </TouchableOpacity>
@@ -136,7 +180,7 @@ export default function CheckoutScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F9F9F9',
+        backgroundColor: '#FFF7EC',
     },
     header: {
         flexDirection: 'row',
@@ -158,6 +202,8 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 20,
         paddingVertical: 10,
+        // The key change to make the "Add new card" section visible
+        paddingBottom: 100,
     },
     sectionContainer: {
         marginBottom: 20,
@@ -287,8 +333,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#fff',
         borderRadius: 15,
-        padding: 15,
+        padding: 10,
         marginBottom: 15,
+        marginTop: -7,
     },
     bankLogo: {
         width: 40,
@@ -314,19 +361,24 @@ const styles = StyleSheet.create({
     addCardButton: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 15,
+        justifyContent: 'center',
         backgroundColor: '#fff',
-        borderRadius: 15,
+        borderRadius: 25,
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        marginTop: -8,
+        borderColor: '#A68B69',
+        borderWidth: 1,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
+        shadowOpacity: 0.1,
         shadowRadius: 3,
-        elevation: 2,
+        elevation: 3,
     },
     addCardText: {
-        fontFamily: 'Montserrat_400Regular',
-        fontSize: 14,
-        color: '#000',
+        fontFamily: 'Montserrat_600SemiBold',
+        fontSize: 16,
+        color: '#A68B69',
         marginLeft: 10,
     },
     bottomBar: {
@@ -364,4 +416,46 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 2,
     },
-});
+    // New styles for the card form
+    newCardFormContainer: {
+        backgroundColor: '#fff',
+        borderRadius: 15,
+        padding: 20,
+        marginBottom: 20,
+    },
+    formTitle: {
+        fontFamily: 'Montserrat_600SemiBold',
+        fontSize: 16,
+        marginBottom: 15,
+        textAlign: 'center',
+    },
+    input: {
+        fontFamily: 'Montserrat_400Regular',
+        backgroundColor: '#F0F0F0',
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        paddingVertical: 12,
+        marginBottom: 15,
+        fontSize: 14,
+        color: '#000',
+    },
+    inputRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    inputHalf: {
+        width: '48%',
+    },
+    saveCardButton: {
+        backgroundColor: '#A68B69',
+        borderRadius: 25,
+        paddingVertical: 15,
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    saveCardText: {
+        fontFamily: 'Montserrat_600SemiBold',
+        fontSize: 16,
+        color: '#fff',
+    },
+}); 

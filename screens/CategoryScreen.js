@@ -159,7 +159,7 @@ export default function CategoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF7EC',
   },
   header: {
     flexDirection: 'row',

@@ -121,7 +121,7 @@ export default function ProductListScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9F7EF',
+    backgroundColor: '#FFF7EC',
   },
   header: {
     flexDirection: 'row',

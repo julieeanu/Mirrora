@@ -39,7 +39,7 @@ export default function ChatbotScreen({ onGoBack }) {
 
     const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold });
     const [montserratLoaded] = useMontserrat({ Montserrat_400Regular, Montserrat_600SemiBold });
-  
+ 
     if (!leagueSpartanLoaded || !montserratLoaded) {
       return null;
     }
@@ -273,5 +273,12 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 3,
         elevation: 2,
+    },
+    dateSeparator: {
+        fontFamily: 'Montserrat_400Regular',
+        fontSize: 12,
+        color: '#777',
+        textAlign: 'center',
+        marginVertical: 10,
     },
 });
