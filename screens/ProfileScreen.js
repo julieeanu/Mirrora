@@ -1,35 +1,70 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Modal } from 'react-native';
-import { useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Modal, ActivityIndicator, Platform } from 'react-native';
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
 import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_600SemiBold } from "@expo-google-fonts/montserrat";
 import BottomNavigationBar from '../components/BottomNavigationBar';
 
+// --- Firebase Imports ---
+import { auth, db } from '../Backend/firebaseConfig';
+import { signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+
 export default function ProfileScreen() {
     const navigation = useNavigation();
+    const isFocused = useIsFocused();
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [loading, setLoading] = useState(true);
 
-    // Load fonts. The conditional return is safe because the hooks are at the top.
     const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold, });
     const [montserratLoaded] = useMontserrat({ Montserrat_400Regular, Montserrat_600SemiBold });
 
-    // Dummy user data
-    const user = {
-        name: 'Aubrie Marie Dual',
-        username: '@aubriemariedual',
-        avatar: require('../assets/profile.png'), // Placeholder image for user avatar
-    };
+    // This useEffect hook fetches user data from Firebase every time the screen is focused.
+    useEffect(() => {
+        const fetchUserData = async () => {
+            setLoading(true);
+            try {
+                const currentUser = auth.currentUser;
+                if (currentUser) {
+                    setEmail(currentUser.email);
+
+                    const userDocRef = doc(db, "users", currentUser.uid);
+                    const docSnap = await getDoc(userDocRef);
+
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
+                        setName(userData.name || currentUser.displayName || 'No name set');
+                    } else {
+                        setName(currentUser.displayName || 'No name set');
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch user data for profile:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        
+        if (isFocused) {
+            fetchUserData();
+        }
+
+    }, [isFocused]);
 
     if (!leagueSpartanLoaded || !montserratLoaded) {
         return null;
     }
 
     const handleLogout = () => {
-        // Implement your actual logout logic here
-        setShowLogoutModal(false);
-        // Example: navigation.navigate('LoginScreen');
-        console.log("User logged out");
+        signOut(auth)
+            .then(() => {
+                setShowLogoutModal(false);
+                // Navigation to login screen is handled by the auth state listener in App.js
+            })
+            .catch(error => console.error('Sign out error', error));
     };
 
     const ProfileMenuItem = ({ icon, title, onPress }) => (
@@ -43,6 +78,14 @@ export default function ProfileScreen() {
             <Icon name="chevron-right" size={24} color="#777" />
         </TouchableOpacity>
     );
+
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#A68B69" />
+            </View>
+        );
+    }
 
     return (
         <View style={styles.container}>
@@ -58,19 +101,20 @@ export default function ProfileScreen() {
             <ScrollView contentContainerStyle={styles.contentContainer}>
                 {/* User Info Section with relative positioning for edit icon */}
                 <View style={[styles.userInfoSection, { position: 'relative' }]}>
-                    <Image source={user.avatar} style={styles.avatar} />
+                    <Image source={require('../assets/profile.png')} style={styles.avatar} />
                     {/* New edit icon on top of the avatar */}
                     <TouchableOpacity style={styles.editIconContainer} onPress={() => navigation.navigate('CompleteProfile')}>
                         <Icon name="pencil" size={18} color="#A68B69" />
                     </TouchableOpacity>
-                    <Text style={styles.userName}>{user.name}</Text>
-                    <Text style={styles.userHandle}>{user.username}</Text>
+                    <Text style={styles.userName}>{name}</Text>
+                    <Text style={styles.userHandle}>{email}</Text>
                 </View>
 
                 {/* Menu Items Section */}
                 <View style={styles.menuSection}>
                     <ProfileMenuItem icon="account-outline" title="Edit Profile" onPress={() => navigation.navigate('CompleteProfile')} />
-                    <ProfileMenuItem icon="archive-outline" title="My Order" onPress={() => navigation.navigate('MyOrderScreen')} />
+                    <ProfileMenuItem icon="archive-outline" title="My Orders" onPress={() => navigation.navigate('MyOrderScreen')} />
+                    <ProfileMenuItem icon="heart-outline" title="Wishlist" onPress={() => navigation.navigate('Wishlist')} />
                     <ProfileMenuItem icon="help-circle-outline" title="Help & Support" onPress={() => navigation.navigate('HelpAndSupportScreen')} />
                     <ProfileMenuItem icon="cog-outline" title="Setting" onPress={() => { }} />
                 </View>
@@ -86,14 +130,12 @@ export default function ProfileScreen() {
                 animationType="fade"
                 transparent={true}
                 visible={showLogoutModal}
-                onRequestClose={() => {
-                    setShowLogoutModal(!showLogoutModal);
-                }}
+                onRequestClose={() => setShowLogoutModal(false)}
             >
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
                         <Text style={styles.modalTitle}>Logout</Text>
-                        <Text style={styles.modalText}>Are you sure you want to logout?</Text>
+                        <Text style={styles.modalText}>Are you sure you want to log out?</Text>
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity
                                 style={[styles.modalButton, styles.cancelButton]}
@@ -119,6 +161,12 @@ export default function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F9F9F9',
+    },
     container: {
         flex: 1,
         backgroundColor: '#F9F9F9',
@@ -128,7 +176,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 20,
-        paddingTop: 50,
+        paddingTop: Platform.OS === 'android' ? 50 : 60,
         paddingBottom: 15,
         backgroundColor: '#fff',
         borderBottomWidth: 1,
@@ -142,8 +190,8 @@ const styles = StyleSheet.create({
     contentContainer: {
         padding: 20,
         alignItems: 'center',
+        paddingBottom: 80,
     },
-    // User Info styles
     userInfoSection: {
         alignItems: 'center',
         marginBottom: 30,
@@ -154,11 +202,10 @@ const styles = StyleSheet.create({
         borderRadius: 60,
         marginBottom: 10,
     },
-    // Styles for the new edit icon container on the avatar
     editIconContainer: {
         position: 'absolute',
-        right: 20,
-        bottom: 50,
+        right: 25,
+        bottom: 55,
         backgroundColor: '#F3EFE9',
         width: 36,
         height: 36,
@@ -178,7 +225,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#777',
     },
-    // Menu styles
     menuSection: {
         width: '100%',
         backgroundColor: '#fff',
@@ -218,7 +264,6 @@ const styles = StyleSheet.create({
         color: '#000',
         marginLeft: 15,
     },
-    // Logout button styles
     logoutButton: {
         width: "100%",
         height: 50,
@@ -238,12 +283,11 @@ const styles = StyleSheet.create({
         fontFamily: 'Montserrat_600SemiBold',
         fontSize: 18,
     },
-    // Modal styles
     centeredView: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // This creates the blur effect
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalView: {
         margin: 20,

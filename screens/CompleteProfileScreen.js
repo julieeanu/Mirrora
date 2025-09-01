@@ -1,20 +1,104 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, ScrollView, Platform, Modal, Pressable } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, ScrollView, Platform, Modal, Pressable, Alert, ActivityIndicator } from 'react-native';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { useNavigation } from "@react-navigation/native";
 import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
 import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_600SemiBold } from "@expo-google-fonts/montserrat";
 
+// --- Firebase Imports ---
+import { auth, db } from '../Backend/firebaseConfig';
+import { updateProfile, signInWithCustomToken } from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+
 export default function CompleteProfileScreen() {
+    const navigation = useNavigation();
     const [name, setName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [gender, setGender] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
 
+    // --- State for Backend Operations ---
+    const [loading, setLoading] = useState(true); // For initial data fetch
+    const [saving, setSaving] = useState(false);  // For when the user clicks save
+
     const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold, });
     const [montserratLoaded] = useMontserrat({ Montserrat_400Regular, Montserrat_600SemiBold });
 
+    // --- Fetch Existing Profile Data ---
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                // Attempt to sign in with the custom token if it exists
+                if (typeof __initial_auth_token !== 'undefined' && !auth.currentUser) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                }
+
+                const currentUser = auth.currentUser;
+                if (currentUser) {
+                    const userDocRef = doc(db, "users", currentUser.uid);
+                    const docSnap = await getDoc(userDocRef);
+
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
+                        setName(userData.name || currentUser.displayName || '');
+                        setPhoneNumber(userData.phoneNumber || '');
+                        setGender(userData.gender || '');
+                    } else {
+                        setName(currentUser.displayName || '');
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to fetch user data:", error);
+                Alert.alert("Error", "Could not load profile data. Please check your connection or try again later.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
+    // --- Save Profile Data ---
+    const handleSaveProfile = async () => {
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+
+        if (!name.trim()) {
+            Alert.alert("Validation Error", "Please enter your full name.");
+            return;
+        }
+
+        setSaving(true);
+        try {
+            await updateProfile(currentUser, { displayName: name });
+            const userDocRef = doc(db, "users", currentUser.uid);
+            await setDoc(userDocRef, {
+                name: name,
+                phoneNumber: phoneNumber,
+                gender: gender,
+                email: currentUser.email
+            }, { merge: true });
+
+            Alert.alert("Success", "Your profile has been updated.");
+            navigation.goBack();
+        } catch (error) {
+            console.error("Profile update error:", error);
+            Alert.alert("Error", "Could not update your profile.");
+        } finally {
+            setSaving(false);
+        }
+    };
+
     if (!leagueSpartanLoaded || !montserratLoaded) {
         return null;
+    }
+
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#A68B69" />
+            </View>
+        );
     }
 
     const GenderModal = () => {
@@ -60,10 +144,7 @@ export default function CompleteProfileScreen() {
 
                 {/* Profile Picture Section */}
                 <View style={styles.profileImageContainer}>
-                    <Image
-                        source={require('../assets/profile-placeholder.png')} // Replace with your image source
-                        style={styles.profileImage}
-                    />
+                    <Icon name="account-circle" size={120} color="#A68B69" />
                     <TouchableOpacity style={styles.editIcon}>
                         <Icon name="pencil" size={16} color="#000" />
                     </TouchableOpacity>
@@ -76,6 +157,7 @@ export default function CompleteProfileScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="John Doe"
+                        placeholderTextColor="#777"
                         value={name}
                         onChangeText={setName}
                     />
@@ -90,6 +172,7 @@ export default function CompleteProfileScreen() {
                         <TextInput
                             style={styles.phoneInput}
                             placeholder="Enter Phone Number"
+                            placeholderTextColor="#777"
                             keyboardType="phone-pad"
                             value={phoneNumber}
                             onChangeText={setPhoneNumber}
@@ -105,8 +188,12 @@ export default function CompleteProfileScreen() {
                 </View>
 
                 {/* Complete Profile Button */}
-                <TouchableOpacity style={styles.completeButton}>
-                    <Text style={styles.completeButtonText}>Complete Profile</Text>
+                <TouchableOpacity style={styles.completeButton} onPress={handleSaveProfile} disabled={saving}>
+                    {saving ? (
+                        <ActivityIndicator color="#fff" />
+                    ) : (
+                        <Text style={styles.completeButtonText}>Complete Profile</Text>
+                    )}
                 </TouchableOpacity>
             </ScrollView>
 
@@ -119,7 +206,7 @@ export default function CompleteProfileScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F9F9F9',
+        backgroundColor: '#F3EFE9',
     },
     contentContainer: {
         flexGrow: 1,
@@ -146,7 +233,7 @@ const styles = StyleSheet.create({
         lineHeight: 20,
         paddingHorizontal: 20,
     },
-    profileImage: {
+    profileImageContainer: {
         width: 120,
         height: 120,
         borderRadius: 60,
@@ -154,6 +241,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 30,
+        position: 'relative',
     },
     editIcon: {
         position: 'absolute',
@@ -202,6 +290,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#F3EFE9',
         borderRadius: 10,
         marginBottom: 20,
+        height: 50,
     },
     countryCodeContainer: {
         flexDirection: 'row',
@@ -209,6 +298,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         borderRightWidth: 1,
         borderRightColor: '#ccc',
+        height: '100%',
     },
     countryCodeText: {
         fontFamily: 'Montserrat_400Regular',
@@ -217,7 +307,7 @@ const styles = StyleSheet.create({
     },
     phoneInput: {
         flex: 1,
-        height: 50,
+        height: '100%',
         paddingHorizontal: 15,
         fontFamily: 'Montserrat_400Regular',
     },
@@ -229,6 +319,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         height: 50,
         justifyContent: 'space-between',
+        marginBottom: 20,
     },
     dropdownValue: {
         flex: 1,

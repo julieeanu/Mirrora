@@ -1,37 +1,81 @@
-// CreateAccountScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ImageBackground } from 'react-native';
-// Replaced Ionicons with MaterialCommunityIcons to access the lock-check icon
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ImageBackground, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CheckBox from 'expo-checkbox';
 
-// ✅ Font imports
+// --- Firebase Imports ---
+// ✅ Import updateProfile to save the user's name
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { auth } from '../Backend/firebaseConfig'; // Make sure this path is correct
+
+// Font imports
 import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
 import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_600SemiBold, Montserrat_700Bold } from "@expo-google-fonts/montserrat";
 
 export default function CreateAccountScreen({ navigation }) {
+  // --- State for inputs ---
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [isChecked, setChecked] = useState(false);
 
-  // ✅ Load fonts
-  const [leagueSpartanLoaded] = useLeagueSpartan({
-    LeagueSpartan_700Bold,
-  });
-
-  const [montserratLoaded] = useMontserrat({
-    Montserrat_400Regular,
-    Montserrat_600SemiBold,
-    Montserrat_700Bold
-  });
+  const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold });
+  const [montserratLoaded] = useMontserrat({ Montserrat_400Regular, Montserrat_600SemiBold, Montserrat_700Bold });
 
   if (!leagueSpartanLoaded || !montserratLoaded) {
-    return null; // Wait for fonts to load
+    return null;
   }
+
+  // --- Handle Account Creation ---
+  const handleCreateAccount = async () => {
+    // Basic Validation
+    if (!fullName || !email || !password || !confirmPassword) {
+      Alert.alert('Missing Fields', 'Please fill out all fields.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      Alert.alert('Password Mismatch', 'The passwords do not match.');
+      return;
+    }
+    if (password.length < 6) {
+        Alert.alert('Weak Password', 'Password should be at least 6 characters.');
+        return;
+    }
+    if (!isChecked) {
+      Alert.alert('Terms & Conditions', 'You must agree to the Terms & Conditions.');
+      return;
+    }
+
+    try {
+      // 1. Create user with Firebase
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // 2. ✅ Update their profile with the full name
+      await updateProfile(userCredential.user, {
+        displayName: fullName
+      });
+      
+      // On success, the onAuthStateChanged listener in StackNavigator will handle navigation.
+
+    } catch (error) {
+      // Handle Firebase errors with user-friendly messages
+      if (error.code === 'auth/email-already-in-use') {
+        Alert.alert('Account Creation Failed', 'This email already exists.');
+      } else if (error.code === 'auth/invalid-email') {
+        Alert.alert('Invalid Email', 'Please enter a valid email address.');
+      } else {
+        Alert.alert('Signup Failed', 'An unexpected error occurred. Please try again.');
+      }
+      console.error("Firebase signup error:", error);
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* ✅ Background top section */}
       <ImageBackground 
         source={require("../assets/header-bg.png")}
         style={styles.headerBg}
@@ -41,49 +85,46 @@ export default function CreateAccountScreen({ navigation }) {
         <Text style={styles.subtitle}>Fill your information below</Text>
       </ImageBackground>
 
-      {/* ✅ Inputs */}
       <View style={styles.formContainer}>
         
-        {/* Full Name */}
         <View style={styles.inputContainer}>
           <Icon name="account-outline" size={20} color="#A1866F" style={styles.icon} />
-          <TextInput placeholder="Full Name" style={styles.textInput} />
+          <TextInput placeholder="Full Name" style={styles.textInput} value={fullName} onChangeText={setFullName} />
         </View>
 
-        {/* Email */}
         <View style={styles.inputContainer}>
           <Icon name="email-outline" size={20} color="#A1866F" style={styles.icon} />
-          <TextInput placeholder="Email" style={styles.textInput} keyboardType="email-address" />
+          <TextInput placeholder="Email" style={styles.textInput} keyboardType="email-address" value={email} onChangeText={setEmail} autoCapitalize="none" />
         </View>
 
-        {/* Password */}
         <View style={styles.inputContainer}>
           <Icon name="lock-outline" size={20} color="#A1866F" style={styles.icon} />
           <TextInput
             placeholder="Password"
             secureTextEntry={!passwordVisible}
             style={styles.textInput}
+            value={password}
+            onChangeText={setPassword}
           />
           <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
             <Icon name={passwordVisible ? 'eye-outline' : 'eye-off-outline'} size={20} color="#A1866F" />
           </TouchableOpacity>
         </View>
 
-        {/* Confirm Password */}
         <View style={styles.inputContainer}>
-          {/* Using lock-check-outline from MaterialCommunityIcons */}
           <Icon name="lock-check-outline" size={20} color="#A1866F" style={styles.icon} />
           <TextInput
             placeholder="Confirm Password"
             secureTextEntry={!confirmPasswordVisible}
             style={styles.textInput}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
           />
           <TouchableOpacity onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}>
             <Icon name={confirmPasswordVisible ? 'eye-outline' : 'eye-off-outline'} size={20} color="#A1866F" />
           </TouchableOpacity>
         </View>
 
-        {/* Terms & Conditions */}
         <View style={styles.checkboxContainer}>
           <CheckBox 
             value={isChecked} 
@@ -96,15 +137,13 @@ export default function CreateAccountScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Create Account Button */}
         <TouchableOpacity 
           style={styles.button} 
-          onPress={() => navigation.navigate('Home')} // Changed navigation destination here
+          onPress={handleCreateAccount}
         >
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
 
-        {/* Sign In Link */}
         <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
           <Text style={styles.link}>Already have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
@@ -116,6 +155,7 @@ export default function CreateAccountScreen({ navigation }) {
   );
 }
 
+// Keep your existing styles
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
@@ -123,7 +163,7 @@ const styles = StyleSheet.create({
   },
   headerBg: {
     width: "100%",
-    height: 280, // lowered header
+    height: 280,
     justifyContent: "flex-end",
     alignItems: "center",
     paddingBottom: 25,
@@ -171,14 +211,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 15,
   },
-  // Adjusted font size for "Agree with"
   agreeWithText: {
     color: '#000',
     fontSize: 14,
     fontFamily: 'Montserrat_400Regular',
     paddingLeft: 10,
   },
-  // Updated style for "Terms & Condition"
   termsAndConditionText: {
     color: '#A68B69',
     fontFamily: 'Montserrat_400Regular',
@@ -211,3 +249,4 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 });
+

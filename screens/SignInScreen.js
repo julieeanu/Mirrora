@@ -1,65 +1,78 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet } from "react-native";
-// Changing import from Ionicons to MaterialCommunityIcons
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
 
+// --- Firebase Imports ---
+import { signInWithEmailAndPassword } from 'firebase/auth';
+// ✅ CORRECTED PATH: Point to the backend folder
+import { auth } from '../Backend/firebaseConfig'; 
+
 // ✅ Import Montserrat and League Spartan
-import {
-  useFonts as useMontserrat,
-  Montserrat_400Regular,
-  Montserrat_700Bold,
-} from "@expo-google-fonts/montserrat";
-import {
-  useFonts as useLeagueSpartan,
-  LeagueSpartan_700Bold,
-} from "@expo-google-fonts/league-spartan";
+import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_700Bold } from "@expo-google-fonts/montserrat";
+import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
 
 export default function SignInScreen() {
+  // --- State for inputs ---
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   const [passwordVisible, setPasswordVisible] = useState(false);
   const navigation = useNavigation();
 
-  // ✅ Load fonts
-  const [montserratLoaded] = useMontserrat({
-    Montserrat_400Regular,
-    Montserrat_700Bold,
-  });
-  const [leagueSpartanLoaded] = useLeagueSpartan({
-    LeagueSpartan_700Bold,
-  });
+  const [montserratLoaded] = useMontserrat({ Montserrat_400Regular, Montserrat_700Bold });
+  const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold });
 
   if (!montserratLoaded || !leagueSpartanLoaded) {
-    return null; // Avoid rendering before fonts are loaded
+    return null; 
   }
+
+  // --- Handle Sign In ---
+  const handleSignIn = async () => {
+    if (!email || !password) {
+      Alert.alert('Missing Fields', 'Please enter both email and password.');
+      return;
+    }
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      // On success, the onAuthStateChanged listener in your App.js
+      // will handle navigation to the 'Home' screen automatically.
+      // You don't need navigation.navigate('Home') here if you set that up.
+      navigation.navigate('Home');
+    } catch (error) {
+      Alert.alert('Sign In Failed', 'Invalid email or password. Please try again.');
+      console.error("Firebase sign in error:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      {/* Top background PNG */}
       <Image source={require("../assets/header.png")} style={styles.topImage} />
 
-      {/* Title */}
       <Text style={styles.title}>Sign In</Text>
       <Text style={styles.subtitle}>Hi! Welcome back, you’ve been missed</Text>
 
-      {/* Email with Icon */}
       <View style={styles.inputContainer}>
-        {/* Changed icon and color to match CreateAccountScreen */}
         <Icon name="email-outline" size={20} color="#A1866F" style={styles.icon} />
         <TextInput
           style={styles.inputField}
           placeholder="example@gmail.com"
           keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
         />
       </View>
 
-      {/* Password with Icon + Eye toggle */}
       <View style={styles.inputContainer}>
-        {/* Changed icon and color to match CreateAccountScreen */}
         <Icon name="lock-outline" size={20} color="#A1866F" style={styles.icon} />
         <TextInput
           style={styles.inputField}
           placeholder="Password"
           secureTextEntry={!passwordVisible}
+          value={password}
+          onChangeText={setPassword}
         />
         <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
           <Icon
@@ -70,20 +83,17 @@ export default function SignInScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Forgot Password */}
       <TouchableOpacity onPress={() => navigation.navigate("NewPassword")}>
         <Text style={styles.forgotText}>Forgot Password?</Text>
       </TouchableOpacity>
 
-      {/* Sign In Button */}
       <TouchableOpacity
         style={styles.signInButton}
-        onPress={() => navigation.navigate("Home")} // ✅ Navigates to Home
+        onPress={handleSignIn} // Use the Firebase handler
       >
         <Text style={styles.signInText}>Sign In</Text>
       </TouchableOpacity>
 
-      {/* Sign Up Link */}
       <Text style={[styles.signupText, { color: "black" }]}>
         Don’t have an account?{" "}
         <Text
@@ -125,7 +135,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "85%",
     height: 50,
-    backgroundColor: "#FFFFFF", // Added background color
+    backgroundColor: "#FFFFFF", 
     borderRadius: 8,
     paddingHorizontal: 10,
     marginBottom: 15,
@@ -179,3 +189,4 @@ const styles = StyleSheet.create({
     fontFamily: "Montserrat_700Bold",
   },
 });
+
