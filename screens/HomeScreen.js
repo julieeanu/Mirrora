@@ -56,7 +56,7 @@ export default function HomeScreen() {
                 <Text style={styles.headerTitle}>Mirrora Philippines</Text>
                 {/* Updated onPress to navigate to MessageScreen */}
                 <TouchableOpacity onPress={() => navigation.navigate('MessageScreen')}>
-                    <Icon name="comment-processing-outline" size={24} color="#000" />
+                    <Icon name="chat-processing" size={24} color="#A68B69" />
                 </TouchableOpacity>
             </View>
 
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         // Change the background color to the desired color
-        backgroundColor: '#FFF7EC',
+        backgroundColor: '#F9F9F9',
     },
     scrollContent: {
         paddingBottom: 80, // Add padding for bottom nav

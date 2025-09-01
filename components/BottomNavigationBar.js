@@ -11,7 +11,7 @@ const BottomNavigationBar = () => {
 
   const navItems = [
     { name: 'home', icon: 'home-outline', activeIcon: 'home', screen: 'Home' },
-    { name: 'categories', icon: 'grid-outline', activeIcon: 'grid', screen: 'CategoryScreen' },
+    { name: 'categories', icon: 'contrast-outline', activeIcon: 'contrast', screen: 'CategoryScreen' },
     { name: 'wishlist', icon: 'heart-outline', activeIcon: 'heart', screen: 'Wishlist' },
     { name: 'cart', icon: 'cart-outline', activeIcon: 'cart', screen: 'CartScreen' },
     { name: 'account', icon: 'person-outline', activeIcon: 'person', screen: 'ProfileScreen' },

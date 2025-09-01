@@ -35,8 +35,8 @@ export default function WishlistScreen() {
                 <Image source={item.image} style={styles.productImage} />
                 <View style={styles.productInfo}>
                     <Text style={styles.productPrice}>{item.price}</Text>
-                    <TouchableOpacity>
-                        <Icon name="cart-plus" size={24} color="#A68B69" />
+                    <TouchableOpacity style={styles.cartIconContainer}>
+                        <Icon name="cart-plus" size={20} color="#000" />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         // The only change is here
-        backgroundColor: '#FFF7EC',
+        backgroundColor: '#F9F9F9',
     },
     header: {
         flexDirection: 'row',
@@ -160,4 +160,14 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#000',
     },
+    cartIconContainer: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+},
 });
