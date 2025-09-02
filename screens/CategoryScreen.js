@@ -72,11 +72,11 @@ export default function CategoryScreen() {
   });
 
   const categories = [
-    { id: '1', name: 'Irregular Mirror', image: require('../assets/irregular.png') },
-    { id: '2', name: 'Capsule Mirror', image: require('../assets/capsule_3.png') },
-    { id: '3', name: 'Grid Mirror', image: require('../assets/grid.png') },
-    { id: '4', name: 'Arch Mirror', image: require('../assets/arch.png') },
-    { id: '5', name: 'Round Mirror', image: require('../assets/round.png') },
+      { id: '1', name: 'Irregular Mirror', image: require('../assets/Category/irregular.png') },
+    { id: '2', name: 'Capsule Mirror', image: require('../assets/Category/capsule_3.png') },
+    { id: '3', name: 'Grid Mirror', image: require('../assets/Category/grid.png') },
+    { id: '4', name: 'Arch Mirror', image: require('../assets/Category/arch.png') },
+    { id: '5', name: 'Round Mirror', image: require('../assets/Category/round.png') },
   ];
 
   if (!leagueSpartanLoaded || !montserratLoaded) {

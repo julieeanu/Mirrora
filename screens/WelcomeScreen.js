@@ -31,10 +31,10 @@ const WelcomeScreen = () => {
     <View style={styles.container}>
       {/* Images */}
       <View style={styles.imageContainer}>
-        <Image source={require('../assets/mirror1.png')} style={styles.largeImage} />
+        <Image source={require('../assets/WelcomeScreen/mirror1.png')} style={styles.largeImage} />
         <View style={styles.smallImages}>
-          <Image source={require('../assets/mirror2.png')} style={styles.mirror2Image} />
-          <Image source={require('../assets/mirror3.png')} style={styles.mirror3Image} />
+          <Image source={require('../assets/WelcomeScreen/mirror2.png')} style={styles.mirror2Image} />
+          <Image source={require('../assets/WelcomeScreen/mirror3.png')} style={styles.mirror3Image} />
         </View>
       </View>
 

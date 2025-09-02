@@ -21,7 +21,7 @@ export default function MyOrderScreen() {
             size: '60.2" x 51.2"',
             price: '2,000',
             total: '2,250',
-            image: require('../assets/mirror1.png'), // Placeholder image
+            image: require('../assets/WelcomeScreen/mirror1.png'), // Placeholder image
         },
         {
             id: '2',
@@ -29,7 +29,7 @@ export default function MyOrderScreen() {
             size: '20.2" x 30.2"',
             price: '2,000',
             total: '2,250',
-            image: require('../assets/mirror2.png'), // Placeholder image
+            image: require('../assets/WelcomeScreen/mirror2.png'), // Placeholder image
         },
         {
             id: '3',
@@ -37,7 +37,7 @@ export default function MyOrderScreen() {
             size: '60.2" x 51.2"',
             price: '2,000',
             total: '2,250',
-            image: require('../assets/mirror3.png'), // Placeholder image
+            image: require('../assets/WelcomeScreen/mirror3.png'), // Placeholder image
         },
         {
             id: '4',
