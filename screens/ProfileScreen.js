@@ -47,7 +47,7 @@ export default function ProfileScreen() {
                 setLoading(false);
             }
         };
-        
+
         if (isFocused) {
             fetchUserData();
         }
@@ -58,13 +58,14 @@ export default function ProfileScreen() {
         return null;
     }
 
-    const handleLogout = () => {
-        signOut(auth)
-            .then(() => {
-                setShowLogoutModal(false);
-                // Navigation to login screen is handled by the auth state listener in App.js
-            })
-            .catch(error => console.error('Sign out error', error));
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+            setShowLogoutModal(false);
+            navigation.navigate('SignIn'); // Navigate to the SignIn screen after successful sign-out
+        } catch (error) {
+            console.error('Sign out error', error);
+        }
     };
 
     const ProfileMenuItem = ({ icon, title, onPress }) => (
@@ -116,9 +117,9 @@ export default function ProfileScreen() {
                     <ProfileMenuItem icon="archive-outline" title="My Orders" onPress={() => navigation.navigate('MyOrderScreen')} />
                     <ProfileMenuItem icon="heart-outline" title="Wishlist" onPress={() => navigation.navigate('Wishlist')} />
                     <ProfileMenuItem icon="help-circle-outline" title="Help & Support" onPress={() => navigation.navigate('HelpAndSupportScreen')} />
-                    <ProfileMenuItem icon="cog-outline" title="Setting" onPress={() => { }} />
+                    <ProfileMenuItem icon="cog-outline" title="Setting" onPress={() => navigation.navigate('SettingScreen')} />
                 </View>
-                
+
                 {/* Logout Button */}
                 <TouchableOpacity style={styles.logoutButton} onPress={() => setShowLogoutModal(true)}>
                     <Text style={styles.logoutButtonText}>Logout</Text>
@@ -153,7 +154,7 @@ export default function ProfileScreen() {
                     </View>
                 </View>
             </Modal>
-            
+
             {/* Bottom Navigation Bar */}
             <BottomNavigationBar navigation={navigation} currentScreen="account" />
         </View>

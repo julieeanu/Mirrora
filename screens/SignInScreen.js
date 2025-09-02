@@ -83,7 +83,7 @@ export default function SignInScreen() {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity onPress={() => navigation.navigate("NewPassword")}>
+      <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
         <Text style={styles.forgotText}>Forgot Password?</Text>
       </TouchableOpacity>
 

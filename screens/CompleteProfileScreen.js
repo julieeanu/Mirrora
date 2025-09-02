@@ -144,7 +144,7 @@ export default function CompleteProfileScreen() {
 
                 {/* Profile Picture Section */}
                 <View style={styles.profileImageContainer}>
-                    <Icon name="account-circle" size={120} color="#A68B69" />
+                    <Icon name="account" size={80} color="#A68B69" />
                     <TouchableOpacity style={styles.editIcon}>
                         <Icon name="pencil" size={16} color="#000" />
                     </TouchableOpacity>
@@ -157,7 +157,7 @@ export default function CompleteProfileScreen() {
                     <TextInput
                         style={styles.input}
                         placeholder="John Doe"
-                        placeholderTextColor="#777"
+                        placeholderTextColor="#999"
                         value={name}
                         onChangeText={setName}
                     />
@@ -167,12 +167,12 @@ export default function CompleteProfileScreen() {
                     <View style={styles.phoneInputContainer}>
                         <View style={styles.countryCodeContainer}>
                             <Text style={styles.countryCodeText}>+63</Text>
-                            <Icon name="chevron-down" size={16} color="#777" />
+                            <Icon name="chevron-down" size={16} color="#999" />
                         </View>
                         <TextInput
                             style={styles.phoneInput}
                             placeholder="Enter Phone Number"
-                            placeholderTextColor="#777"
+                            placeholderTextColor="#999"
                             keyboardType="phone-pad"
                             value={phoneNumber}
                             onChangeText={setPhoneNumber}
@@ -182,8 +182,10 @@ export default function CompleteProfileScreen() {
                     {/* Gender Dropdown */}
                     <Text style={styles.label}>Gender</Text>
                     <TouchableOpacity style={styles.dropdownContainer} onPress={() => setModalVisible(true)}>
-                        <Text style={styles.dropdownValue}>{gender || 'Select'}</Text>
-                        <Icon name="chevron-down" size={24} color="#777" />
+                        <Text style={[styles.dropdownValue, !gender && styles.placeholderText]}>
+                            {gender || 'Select'}
+                        </Text>
+                        <Icon name="chevron-down" size={20} color="#999" />
                     </TouchableOpacity>
                 </View>
 
@@ -206,59 +208,79 @@ export default function CompleteProfileScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F3EFE9',
+        backgroundColor: '#F5F2EC',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F5F2EC',
     },
     contentContainer: {
         flexGrow: 1,
         alignItems: 'center',
-        paddingHorizontal: 20,
-        paddingTop: 80,
+        paddingHorizontal: 24,
+        paddingTop: 60,
+        paddingBottom: 40,
     },
     header: {
         alignItems: 'center',
-        marginBottom: 30,
+        marginBottom: 35,
+        paddingHorizontal: 5,
     },
     headerTitle: {
-        fontFamily: 'Montserrat_600SemiBold',
-        fontSize: 28,
-        color: '#000',
+        fontFamily: 'LeagueSpartan_700Bold',
+        fontSize: 32,
+        color: '#2C2C2C',
         textAlign: 'center',
-        marginBottom: 10,
+        marginBottom: 16,
+        lineHeight: 38,
     },
     headerSubtitle: {
         fontFamily: 'Montserrat_400Regular',
-        fontSize: 14,
-        color: '#777',
+        fontSize: 15,
+        color: '#888',
         textAlign: 'center',
-        lineHeight: 20,
-        paddingHorizontal: 20,
+        lineHeight: 22,
+        paddingHorizontal: 10,
     },
     profileImageContainer: {
-        width: 120,
-        height: 120,
-        borderRadius: 60,
-        backgroundColor: '#EBE3D5',
+        width: 140,
+        height: 140,
+        borderRadius: 70,
+        backgroundColor: '#E8E2D7',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 30,
+        marginBottom: 50,
         position: 'relative',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.08,
+                shadowRadius: 8,
+            },
+            android: {
+                elevation: 3,
+            },
+        }),
     },
     editIcon: {
         position: 'absolute',
-        bottom: 30,
+        bottom: 8,
         right: 8,
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        backgroundColor: '#F3EFE9',
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
         ...Platform.select({
             ios: {
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 3,
+                shadowOpacity: 0.15,
+                shadowRadius: 4,
             },
             android: {
                 elevation: 4,
@@ -267,82 +289,126 @@ const styles = StyleSheet.create({
     },
     formSection: {
         width: '100%',
-        marginBottom: 20,
+        marginBottom: 40,
     },
     label: {
         fontFamily: 'Montserrat_600SemiBold',
         fontSize: 16,
-        color: '#000',
-        marginBottom: 8,
+        color: '#2C2C2C',
+        marginBottom: 5,
+        marginLeft: 4,
     },
     input: {
         width: '100%',
-        height: 50,
-        backgroundColor: '#F3EFE9',
-        borderRadius: 10,
-        paddingHorizontal: 15,
-        marginBottom: 20,
+        height: 45,
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        paddingHorizontal: 20,
+        marginBottom: 24,
         fontFamily: 'Montserrat_400Regular',
+        fontSize: 16,
+        color: '#2C2C2C',
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.05,
+                shadowRadius: 3,
+            },
+            android: {
+                elevation: 1,
+            },
+        }),
     },
     phoneInputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F3EFE9',
-        borderRadius: 10,
-        marginBottom: 20,
-        height: 50,
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        marginBottom: 24,
+        height: 45,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.05,
+                shadowRadius: 3,
+            },
+            android: {
+                elevation: 1,
+            },
+        }),
     },
     countryCodeContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 15,
+        paddingHorizontal: 16,
         borderRightWidth: 1,
-        borderRightColor: '#ccc',
+        borderRightColor: '#E5E5E5',
         height: '100%',
+        justifyContent: 'center',
+        minWidth: 80,
     },
     countryCodeText: {
         fontFamily: 'Montserrat_400Regular',
-        marginRight: 5,
-        color: '#777',
+        fontSize: 16,
+        marginRight: 6,
+        color: '#2C2C2C',
     },
     phoneInput: {
         flex: 1,
         height: '100%',
-        paddingHorizontal: 15,
+        paddingHorizontal: 16,
         fontFamily: 'Montserrat_400Regular',
+        fontSize: 16,
+        color: '#2C2C2C',
     },
     dropdownContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F3EFE9',
-        borderRadius: 10,
-        paddingHorizontal: 15,
-        height: 50,
+        backgroundColor: '#fff',
+        borderRadius: 12,
+        paddingHorizontal: 20,
+        height: 45,
         justifyContent: 'space-between',
-        marginBottom: 20,
+        marginBottom: 24,
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.05,
+                shadowRadius: 3,
+            },
+            android: {
+                elevation: 1,
+            },
+        }),
     },
     dropdownValue: {
         flex: 1,
         fontFamily: 'Montserrat_400Regular',
-        fontSize: 14,
-        color: '#777',
+        fontSize: 16,
+        color: '#2C2C2C',
+    },
+    placeholderText: {
+        color: '#999',
     },
     completeButton: {
         width: '100%',
         backgroundColor: '#A68B69',
-        paddingVertical: 15,
+        paddingVertical: 18,
         alignItems: 'center',
-        borderRadius: 25,
-        marginBottom: 20,
+        borderRadius: 28,
+        marginTop: -25,
         ...Platform.select({
             ios: {
-                shadowColor: '#000',
+                shadowColor: '#A68B69',
                 shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.2,
-                shadowRadius: 5,
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
             },
             android: {
-                elevation: 5,
+                elevation: 6,
             },
         }),
     },
@@ -350,6 +416,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontFamily: 'Montserrat_600SemiBold',
         fontSize: 18,
+        letterSpacing: 0.5,
     },
     // Modal styles
     centeredView: {
@@ -378,7 +445,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Montserrat_600SemiBold',
         fontSize: 20,
         marginBottom: 15,
-        textAlign: 'center',
+        textAlign: 'center',    
     },
     genderOption: {
         padding: 10,

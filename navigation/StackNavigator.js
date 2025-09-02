@@ -7,7 +7,7 @@ import WelcomeScreen from "../screens/WelcomeScreen";
 import SignInScreen from "../screens/SignInScreen";
 import CreateAccountScreen from '../screens/CreateAccountScreen';
 import CompleteProfileScreen from "../screens/CompleteProfileScreen";
-import NewPasswordScreen from "../screens/NewPasswordScreen"; 
+import ForgotPasswordScreen from "../screens/ForgotPasswordScreen"; 
 import HomeScreen from '../screens/HomeScreen';
 import ProductScreen from '../screens/ProductScreen';
 import WishlistScreen from "../screens/WishlistScreen";
@@ -22,6 +22,7 @@ import ChatbotScreen from "../screens/ChatbotScreen";
 import CheckoutScreen from "../screens/CheckoutScreen";
 import OrderConfirmationScreen from "../screens/OrderConfirmationScreen";
 import MyOrderScreen from "../screens/MyOrderScreen";
+import SettingScreen from "../screens/SettingScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -36,7 +37,7 @@ export default function StackNavigator() {
       <Stack.Screen name="SignIn" component={SignInScreen} />
       <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
       <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} />
-      <Stack.Screen name="NewPassword" component={NewPasswordScreen} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="ProductScreen" component={ProductScreen} />
       <Stack.Screen name="Wishlist" component={WishlistScreen} />
@@ -51,6 +52,7 @@ export default function StackNavigator() {
       <Stack.Screen name="CheckoutScreen" component={CheckoutScreen} />
       <Stack.Screen name="OrderConfirmationScreen" component={OrderConfirmationScreen} />
       <Stack.Screen name="MyOrderScreen" component={MyOrderScreen} />
+      <Stack.Screen name="SettingScreen" component={SettingScreen} />
     </Stack.Navigator>
   );
 }
