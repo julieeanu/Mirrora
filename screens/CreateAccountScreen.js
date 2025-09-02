@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ImageBackground, Alert, Modal } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ImageBackground, Modal, ActivityIndicator } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import CheckBox from 'expo-checkbox';
 
 // --- Firebase Imports ---
-// ✅ Import updateProfile to save the user's name
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { auth } from '../Backend/firebaseConfig'; // Make sure this path is correct
+// Make sure this path is correct for your project
+import { auth } from '../Backend/firebaseConfig'; 
 
 // Font imports
 import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
@@ -19,10 +19,19 @@ export default function CreateAccountScreen({ navigation }) {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [fullName, setFullName] = useState('');
 
+    // --- State for UI/Modals ---
+    // The password fields are hidden by default because this is set to 'false'
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
     const [isChecked, setChecked] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalMessage, setModalMessage] = useState('');
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalIcon, setModalIcon] = useState('information-outline');
+    const [modalIconColor, setModalIconColor] = useState('#2196F3');
+    const [isLoading, setIsLoading] = useState(false);
+    // State to track which input is currently focused
+    const [focusedInput, setFocusedInput] = useState(null);
 
     const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold });
     const [montserratLoaded] = useMontserrat({ Montserrat_400Regular, Montserrat_600SemiBold, Montserrat_700Bold });
@@ -30,24 +39,78 @@ export default function CreateAccountScreen({ navigation }) {
     if (!leagueSpartanLoaded || !montserratLoaded) {
         return null;
     }
+    
+    // Custom modal component for all messages (success, warning, error)
+    const MessageModal = () => (
+        <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+                setModalVisible(false);
+            }}
+        >
+            <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                    <Icon name={modalIcon} size={70} color={modalIconColor} />
+                    <Text style={styles.modalTitle}>{modalTitle}</Text>
+                    <Text style={styles.modalText}>{modalMessage}</Text>
+                    <TouchableOpacity
+                        style={styles.modalButton}
+                        onPress={() => {
+                            setModalVisible(false);
+                            // If it's a success modal, navigate to the SignIn screen
+                            if (modalIcon === 'check-circle-outline') {
+                                navigation.navigate('SignIn');
+                            }
+                        }}
+                    >
+                        <Text style={styles.modalButtonText}>OK</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </Modal>
+    );
 
     // --- Handle Account Creation ---
     const handleCreateAccount = async () => {
+        setIsLoading(true);
+
         // Basic Validation
         if (!fullName || !email || !password || !confirmPassword) {
-            Alert.alert('Missing Fields', 'Please fill out all fields.');
+            setModalTitle('Missing Fields');
+            setModalMessage('Please fill out all fields.');
+            setModalIcon('alert-circle-outline');
+            setModalIconColor('#FFC107');
+            setModalVisible(true);
+            setIsLoading(false);
             return;
         }
         if (password !== confirmPassword) {
-            Alert.alert('Password Mismatch', 'The passwords do not match.');
+            setModalTitle('Password Mismatch');
+            setModalMessage('The passwords do not match.');
+            setModalIcon('alert-circle-outline');
+            setModalIconColor('#FFC107');
+            setModalVisible(true);
+            setIsLoading(false);
             return;
         }
         if (password.length < 6) {
-            Alert.alert('Weak Password', 'Password should be at least 6 characters.');
+            setModalTitle('Weak Password');
+            setModalMessage('Password should be at least 6 characters.');
+            setModalIcon('alert-circle-outline');
+            setModalIconColor('#FFC107');
+            setModalVisible(true);
+            setIsLoading(false);
             return;
         }
         if (!isChecked) {
-            Alert.alert('Terms & Conditions', 'You must agree to the Terms & Conditions.');
+            setModalTitle('Terms & Conditions');
+            setModalMessage('You must agree to the Terms & Conditions.');
+            setModalIcon('alert-circle-outline');
+            setModalIconColor('#FFC107');
+            setModalVisible(true);
+            setIsLoading(false);
             return;
         }
 
@@ -55,57 +118,44 @@ export default function CreateAccountScreen({ navigation }) {
             // 1. Create user with Firebase
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-            // 2. ✅ Update their profile with the full name
+            // 2. Update their profile with the full name
             await updateProfile(userCredential.user, {
                 displayName: fullName
             });
 
+            setModalTitle('Registration Complete!');
+            setModalMessage('Your account has been successfully created.');
+            setModalIcon('check-circle-outline');
+            setModalIconColor('#66BB6A');
             setModalVisible(true);
 
         } catch (error) {
             // Handle Firebase errors with user-friendly messages
             if (error.code === 'auth/email-already-in-use') {
-                Alert.alert('Account Creation Failed', 'This email already exists.');
+                setModalTitle('Account Creation Failed');
+                setModalMessage('This email already exists.');
+                setModalIcon('close-circle-outline');
+                setModalIconColor('#F44336');
+                setModalVisible(true);
             } else if (error.code === 'auth/invalid-email') {
-                Alert.alert('Invalid Email', 'Please enter a valid email address.');
+                setModalTitle('Invalid Email');
+                setModalMessage('Please enter a valid email address.');
+                setModalIcon('close-circle-outline');
+                setModalIconColor('#F44336');
+                setModalVisible(true);
             } else {
-                Alert.alert('Signup Failed', 'An unexpected error occurred. Please try again.');
+                setModalTitle('Signup Failed');
+                setModalMessage('An unexpected error occurred. Please try again.');
+                setModalIcon('close-circle-outline');
+                setModalIconColor('#F44336');
+                setModalVisible(true);
             }
             console.error("Firebase signup error:", error);
+        } finally {
+            setIsLoading(false);
         }
     };
     
-    const SuccessModal = () => (
-        <Modal
-            animationType="fade"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => {
-                setModalVisible(false);
-                navigation.navigate('SignIn');
-            }}
-        >
-            <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                    <Icon name="check-circle-outline" size={70} color="#66BB6A" />
-                    <Text style={styles.modalTitle}>Registration Complete!</Text>
-                    <Text style={styles.modalText}>
-                        Your account has been successfully created.
-                    </Text>
-                    <TouchableOpacity
-                        style={styles.modalButton}
-                        onPress={() => {
-                            setModalVisible(false);
-                            navigation.navigate('SignIn');
-                        }}
-                    >
-                        <Text style={styles.modalButtonText}>Go to Login</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </Modal>
-    );
-
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <ImageBackground
@@ -119,17 +169,42 @@ export default function CreateAccountScreen({ navigation }) {
 
             <View style={styles.formContainer}>
 
-                <View style={styles.inputContainer}>
+                <View style={[
+                    styles.inputContainer,
+                    focusedInput === 'fullName' && styles.focusedInputContainer
+                ]}>
                     <Icon name="account-outline" size={20} color="#A1866F" style={styles.icon} />
-                    <TextInput placeholder="Full Name" style={styles.textInput} value={fullName} onChangeText={setFullName} />
+                    <TextInput 
+                        placeholder="Full Name" 
+                        style={styles.textInput} 
+                        value={fullName} 
+                        onChangeText={setFullName} 
+                        onFocus={() => setFocusedInput('fullName')}
+                        onBlur={() => setFocusedInput(null)}
+                    />
                 </View>
 
-                <View style={styles.inputContainer}>
+                <View style={[
+                    styles.inputContainer,
+                    focusedInput === 'email' && styles.focusedInputContainer
+                ]}>
                     <Icon name="email-outline" size={20} color="#A1866F" style={styles.icon} />
-                    <TextInput placeholder="Email" style={styles.textInput} keyboardType="email-address" value={email} onChangeText={setEmail} autoCapitalize="none" />
+                    <TextInput 
+                        placeholder="Email" 
+                        style={styles.textInput} 
+                        keyboardType="email-address" 
+                        value={email} 
+                        onChangeText={setEmail} 
+                        autoCapitalize="none" 
+                        onFocus={() => setFocusedInput('email')}
+                        onBlur={() => setFocusedInput(null)}
+                    />
                 </View>
 
-                <View style={styles.inputContainer}>
+                <View style={[
+                    styles.inputContainer,
+                    focusedInput === 'password' && styles.focusedInputContainer
+                ]}>
                     <Icon name="lock-outline" size={20} color="#A1866F" style={styles.icon} />
                     <TextInput
                         placeholder="Password"
@@ -137,13 +212,18 @@ export default function CreateAccountScreen({ navigation }) {
                         style={styles.textInput}
                         value={password}
                         onChangeText={setPassword}
+                        onFocus={() => setFocusedInput('password')}
+                        onBlur={() => setFocusedInput(null)}
                     />
                     <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
                         <Icon name={passwordVisible ? 'eye-outline' : 'eye-off-outline'} size={20} color="#A1866F" />
                     </TouchableOpacity>
                 </View>
 
-                <View style={styles.inputContainer}>
+                <View style={[
+                    styles.inputContainer,
+                    focusedInput === 'confirmPassword' && styles.focusedInputContainer
+                ]}>
                     <Icon name="lock-check-outline" size={20} color="#A1866F" style={styles.icon} />
                     <TextInput
                         placeholder="Confirm Password"
@@ -151,6 +231,8 @@ export default function CreateAccountScreen({ navigation }) {
                         style={styles.textInput}
                         value={confirmPassword}
                         onChangeText={setConfirmPassword}
+                        onFocus={() => setFocusedInput('confirmPassword')}
+                        onBlur={() => setFocusedInput(null)}
                     />
                     <TouchableOpacity onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)}>
                         <Icon name={confirmPasswordVisible ? 'eye-outline' : 'eye-off-outline'} size={20} color="#A1866F" />
@@ -172,8 +254,13 @@ export default function CreateAccountScreen({ navigation }) {
                 <TouchableOpacity
                     style={styles.button}
                     onPress={handleCreateAccount}
+                    disabled={isLoading}
                 >
-                    <Text style={styles.buttonText}>Sign Up</Text>
+                    {isLoading ? (
+                        <ActivityIndicator color="#fff" />
+                    ) : (
+                        <Text style={styles.buttonText}>Sign Up</Text>
+                    )}
                 </TouchableOpacity>
 
                 <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 10 }}>
@@ -183,12 +270,11 @@ export default function CreateAccountScreen({ navigation }) {
                     </TouchableOpacity>
                 </View>
             </View>
-            <SuccessModal />
+            <MessageModal />
         </ScrollView>
     );
 }
 
-// Keep your existing styles
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
@@ -214,22 +300,23 @@ const styles = StyleSheet.create({
     },
     formContainer: {
         paddingHorizontal: 20,
-        paddingTop: 10,
+        paddingTop: 12,
     },
     inputContainer: {
         flexDirection: "row",
         alignItems: "center",
-        borderWidth: 1,
-        borderColor: "#727272",
-        backgroundColor: "#FFFFFF",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.15,
-        shadowRadius: 4,
-        elevation: 3,
+        width: "100%",
+        height: 50,
+        // Added a new border property for focus effect
+        borderWidth: 1.5, 
+        borderColor: "#F5F5F5",
+        backgroundColor: "#F5F5F5",
         borderRadius: 8,
         paddingHorizontal: 10,
         marginTop: 15,
+    },
+    focusedInputContainer: {
+        borderColor: '#A68B69', // Highlight color when focused
     },
     icon: {
         marginRight: 8,

@@ -96,8 +96,9 @@ export default function HomeScreen() {
                         imageStyle={styles.bannerImageStyle}
                     >
                         <View style={styles.bannerContent}>
-                            <Text style={styles.bannerText}>Design Your Perfect Mirror Today</Text>
-                            <Text style={styles.bannerSubtext}>Crafted Just for You!</Text>
+                            <Text style={styles.bannerText}>Design Your Perfect</Text>
+                            <Text style={[styles.bannerText, { color: '#fff' }]}>Mirror Today</Text>
+                            <Text style={[styles.bannerSubtext, { color: '#fff' }]}>Crafted Just for You!</Text>
                             <TouchableOpacity style={styles.customizeButton}>
                                 <Text style={styles.customizeButtonText}>Customize Now</Text>
                             </TouchableOpacity>
@@ -235,7 +236,7 @@ const styles = StyleSheet.create({
     },
     bannerContent: {
         width: '60%',
-        padding: 15,
+        padding: 10,
     },
     bannerText: {
         fontFamily: 'LeagueSpartan_700Bold',
