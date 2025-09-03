@@ -21,11 +21,9 @@ export default function CartScreen() {
 
     // Move the useState hook here, before the conditional return
     const [cartItems, setCartItems] = useState([
-        { id: '1', name: 'Floor Standing Mirror', size: "60.2\" x 51.2\"", price: 2000, quantity: 1, image: require('../assets/mirror4.png'), isSelected: true },
-        { id: '2', name: 'Floor Standing Mirror', size: "60.2\" x 51.2\"", price: 2000, quantity: 1, image: require('../assets/mirror4.png'), isSelected: false },
-        { id: '3', name: 'Floor Standing Mirror', size: "60.2\" x 51.2\"", price: 2000, quantity: 1, image: require('../assets/mirror4.png'), isSelected: false },
-        { id: '4', name: 'Floor Standing Mirror', size: "60.2\" x 51.2\"", price: 2000, quantity: 1, image: require('../assets/mirror4.png'), isSelected: false },
-        { id: '5', name: 'Floor Standing Mirror', size: "60.2\" x 51.2\"", price: 2000, quantity: 1, image: require('../assets/mirror4.png'), isSelected: false },
+        { id: '1', name: 'Floor Standing Mirror', size: "60.2\" x 51.2\"", price: 2000, quantity: 1, image: require('../assets/home/mirror1.png'), isSelected: true },
+        { id: '2', name: 'Floor Standing Mirror', size: "60.2\" x 51.2\"", price: 2000, quantity: 1, image: require('../assets/home/mirror1.png'), isSelected: false },
+        { id: '3', name: 'Floor Standing Mirror', size: "60.2\" x 51.2\"", price: 2000, quantity: 1, image: require('../assets/home/mirror1.png'), isSelected: false },
     ]);
     
     // The conditional return is now safe because all hooks have been called

@@ -1,8 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useNavigationState } from '@react-navigation/native';
+
+// Get screen dimensions
+const { width, height } = Dimensions.get('window');
 
 const BottomNavigationBar = () => {
   const navigation = useNavigation();
@@ -27,7 +30,7 @@ const BottomNavigationBar = () => {
   };
 
   return (
-    <View style={[styles.bottomNav, { paddingBottom: insets.bottom }]}>
+    <View style={[styles.bottomNav, { paddingBottom: insets.bottom, width: width }]}>
       {navItems.map((item) => (
         <TouchableOpacity
           key={item.name}
@@ -37,7 +40,7 @@ const BottomNavigationBar = () => {
           <Ionicons
             // Check if the current route name matches the item's screen name
             name={currentRouteName === item.screen ? item.activeIcon : item.icon}
-            size={26}
+            size={width > 400 ? 28 : 26} // Responsive icon size
             color={currentRouteName === item.screen ? '#A68B69' : 'gray'}
           />
         </TouchableOpacity>
@@ -51,7 +54,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    height: 60,
+    height: height * 0.08, // Responsive height (e.g., 8% of screen height)
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#f0f0f0',
@@ -61,9 +64,9 @@ const styles = StyleSheet.create({
     right: 0,
   },
   navItem: {
+    flex: 1, // Distribute available space equally
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    justifyContent: 'center',
   },
 });
 

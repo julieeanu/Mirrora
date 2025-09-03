@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react'; // Import useState
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native'; // Import Modal and TextInput
 import { useRoute, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -12,6 +12,16 @@ export default function ProductScreen() {
     const navigation = useNavigation();
     const { product } = route.params;
 
+    // State to control modal visibility
+    const [isCustomizationModalVisible, setCustomizationModalVisible] = useState(false);
+
+    // State for customization inputs (optional, but good practice for form data)
+    const [roomType, setRoomType] = useState('');
+    const [sizeWidth, setSizeWidth] = useState('');
+    const [sizeHeight, setSizeHeight] = useState('');
+    const [frameStyle, setFrameStyle] = useState('');
+    const [addOns, setAddOns] = useState('');
+
     // Load fonts
     const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold });
     const [montserratLoaded] = useMontserrat({ Montserrat_400Regular, Montserrat_600SemiBold });
@@ -19,6 +29,15 @@ export default function ProductScreen() {
     if (!leagueSpartanLoaded || !montserratLoaded) {
         return null; // Wait for fonts to load
     }
+
+    // Function to handle customization submission (e.g., send to cart or apply changes)
+    const handleCustomize = () => {
+        // Here you would process the customization data (roomType, sizeWidth, etc.)
+        console.log("Customization applied:", { roomType, sizeWidth, sizeHeight, frameStyle, addOns });
+        // After processing, close the modal
+        setCustomizationModalVisible(false);
+        // You might want to update the product details or add a customized item to the cart
+    };
 
     return (
         <View style={styles.container}>
@@ -41,8 +60,8 @@ export default function ProductScreen() {
                     {/* Dynamically display the product price */}
                     <Text style={styles.productPrice}>{product.price}</Text>
 
-                    {/* Customization link */}
-                    <TouchableOpacity style={styles.customizeLink} onPress={() => navigation.navigate('CustomizationScreen', { product: product })}>
+                    {/* Customization link - now opens the modal */}
+                    <TouchableOpacity style={styles.customizeLink} onPress={() => setCustomizationModalVisible(true)}>
                         <Text style={styles.customizeText}>Customize</Text>
                     </TouchableOpacity>
 
@@ -77,6 +96,72 @@ export default function ProductScreen() {
                     <Text style={styles.addToCartText}>Add to Cart</Text>
                 </TouchableOpacity>
             </View>
+
+            {/* Customization Modal */}
+            <Modal
+                animationType="slide" // Slide up from the bottom
+                transparent={true} // Allow background to show through
+                visible={isCustomizationModalVisible}
+                onRequestClose={() => {
+                    setCustomizationModalVisible(false); // Close modal on back button press (Android)
+                }}
+            >
+                <View style={modalStyles.modalOverlay}>
+                    <View style={modalStyles.modalContainer}>
+                        <View style={modalStyles.header}>
+                            <TouchableOpacity onPress={() => setCustomizationModalVisible(false)} style={modalStyles.backButton}>
+                                <Icon name="chevron-left" size={30} color="#000" />
+                            </TouchableOpacity>
+                            <Text style={modalStyles.headerTitle}>Customization</Text>
+                        </View>
+
+                        <ScrollView contentContainerStyle={modalStyles.formContainer}>
+                            <Text style={modalStyles.label}>Room Type</Text>
+                            <TextInput
+                                style={modalStyles.input}
+                                value={roomType}
+                                onChangeText={setRoomType}
+                            />
+
+                            <Text style={modalStyles.label}>Size</Text>
+                            <View style={modalStyles.sizeInputs}>
+                                <TextInput
+                                    style={[modalStyles.input, modalStyles.halfInput]}
+                                    keyboardType="numeric"
+                                    value={sizeWidth}
+                                    onChangeText={setSizeWidth}
+                                />
+                                <Text style={modalStyles.multiplier}>x</Text>
+                                <TextInput
+                                    style={[modalStyles.input, modalStyles.halfInput]}
+                                    keyboardType="numeric"
+                                    value={sizeHeight}
+                                    onChangeText={setSizeHeight}
+                                />
+                            </View>
+
+                            <Text style={modalStyles.label}>Frame Style</Text>
+                            <TextInput
+                                style={modalStyles.input}
+                                value={frameStyle}
+                                onChangeText={setFrameStyle}
+                            />
+
+                            <Text style={modalStyles.label}>Add-ons</Text>
+                            <TextInput
+                                style={[modalStyles.input, modalStyles.textArea]}
+                                multiline
+                                value={addOns}
+                                onChangeText={setAddOns}
+                            />
+                        </ScrollView>
+
+                        <TouchableOpacity style={modalStyles.continueButton} onPress={handleCustomize}>
+                            <Text style={modalStyles.continueButtonText}>Continue</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -189,6 +274,99 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     addToCartText: {
+        fontFamily: 'Montserrat_600SemiBold',
+        fontSize: 16,
+        color: '#fff',
+    },
+});
+
+// Styles specifically for the modal content
+const modalStyles = StyleSheet.create({
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dim background
+        justifyContent: 'flex-end', // Aligns modal to the bottom
+    },
+    modalContainer: {
+        backgroundColor: '#FFF7EC',
+        width: '100%',
+        height: '80%', // Adjust height as needed
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        paddingTop: 10,
+        paddingBottom: 20,
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 15,
+        paddingTop: 20,
+        paddingBottom: 15,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: '#E0E0E0',
+    },
+    backButton: {
+        padding: 5,
+        marginRight: 10,
+    },
+    headerTitle: {
+        fontFamily: 'Montserrat_600SemiBold',
+        fontSize: 18,
+        color: '#000',
+        flex: 1, // Allows title to take available space
+        textAlign: 'center', // Center the title
+        marginLeft: -40, // Adjust to visually center due to back button
+    },
+    formContainer: {
+        paddingHorizontal: 20,
+        paddingTop: 20,
+    },
+    label: {
+        fontFamily: 'Montserrat_400Regular',
+        fontSize: 16,
+        color: '#333',
+        marginBottom: 8,
+        marginTop: 15,
+    },
+    input: {
+        fontFamily: 'Montserrat_400Regular',
+        fontSize: 16,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        borderRadius: 8,
+        paddingHorizontal: 15,
+        paddingVertical: 12,
+        backgroundColor: '#fff',
+    },
+    sizeInputs: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    halfInput: {
+        width: '45%',
+    },
+    multiplier: {
+        fontFamily: 'Montserrat_400Regular',
+        fontSize: 18,
+        color: '#555',
+    },
+    textArea: {
+        minHeight: 100,
+        textAlignVertical: 'top',
+        paddingTop: 12,
+    },
+    continueButton: {
+        backgroundColor: '#A68B69',
+        height: 50,
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginHorizontal: 20,
+        marginTop: 30,
+        marginBottom: 10, // Add some bottom margin
+    },
+    continueButtonText: {
         fontFamily: 'Montserrat_600SemiBold',
         fontSize: 16,
         color: '#fff',

@@ -14,13 +14,16 @@ import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_600SemiBol
 
 export default function CreateAccountScreen({ navigation }) {
     // --- State for inputs ---
+    const [firstName, setFirstName] = useState('');
+    const [middleInitial, setMiddleInitial] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [fullName, setFullName] = useState('');
+    const [address, setAddress] = useState('');
 
     // --- State for UI/Modals ---
-    // The password fields are hidden by default because this is set to 'false'
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
     const [isChecked, setChecked] = useState(false);
@@ -30,7 +33,6 @@ export default function CreateAccountScreen({ navigation }) {
     const [modalIcon, setModalIcon] = useState('information-outline');
     const [modalIconColor, setModalIconColor] = useState('#2196F3');
     const [isLoading, setIsLoading] = useState(false);
-    // State to track which input is currently focused
     const [focusedInput, setFocusedInput] = useState(null);
 
     const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold });
@@ -39,7 +41,7 @@ export default function CreateAccountScreen({ navigation }) {
     if (!leagueSpartanLoaded || !montserratLoaded) {
         return null;
     }
-    
+
     // Custom modal component for all messages (success, warning, error)
     const MessageModal = () => (
         <Modal
@@ -59,7 +61,6 @@ export default function CreateAccountScreen({ navigation }) {
                         style={styles.modalButton}
                         onPress={() => {
                             setModalVisible(false);
-                            // If it's a success modal, navigate to the SignIn screen
                             if (modalIcon === 'check-circle-outline') {
                                 navigation.navigate('SignIn');
                             }
@@ -72,20 +73,48 @@ export default function CreateAccountScreen({ navigation }) {
         </Modal>
     );
 
+    // --- New Password Validation Logic ---
+    const validatePassword = (password) => {
+        const validationErrors = [];
+
+        if (password.length < 12) {
+            validationErrors.push('Must be at least 12 characters long.');
+        }
+        if (!/[A-Z]/.test(password)) {
+            validationErrors.push('Must contain at least one uppercase letter.');
+        }
+        if (!/[a-z]/.test(password)) {
+            validationErrors.push('Must contain at least one lowercase letter.');
+        }
+        if (!/[0-9]/.test(password)) {
+            validationErrors.push('Must contain at least one number.');
+        }
+        if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~]/.test(password)) {
+            validationErrors.push('Must contain at least one symbol (e.g., !, @, #).');
+        }
+        
+        return {
+            isValid: validationErrors.length === 0,
+            messages: validationErrors
+        };
+    };
+
     // --- Handle Account Creation ---
     const handleCreateAccount = async () => {
         setIsLoading(true);
+        const fullName = `${firstName}${middleInitial ? ' ' + middleInitial : ''} ${lastName}`;
 
         // Basic Validation
-        if (!fullName || !email || !password || !confirmPassword) {
+        if (!firstName || !lastName || !email || !password || !confirmPassword || !phoneNumber || !address) {
             setModalTitle('Missing Fields');
-            setModalMessage('Please fill out all fields.');
+            setModalMessage('Please fill out all required fields.');
             setModalIcon('alert-circle-outline');
             setModalIconColor('#FFC107');
             setModalVisible(true);
             setIsLoading(false);
             return;
         }
+        
         if (password !== confirmPassword) {
             setModalTitle('Password Mismatch');
             setModalMessage('The passwords do not match.');
@@ -95,15 +124,18 @@ export default function CreateAccountScreen({ navigation }) {
             setIsLoading(false);
             return;
         }
-        if (password.length < 6) {
-            setModalTitle('Weak Password');
-            setModalMessage('Password should be at least 6 characters.');
+
+        const passwordValidationResult = validatePassword(password);
+        if (!passwordValidationResult.isValid) {
+            setModalTitle('Password Requirements Not Met');
+            setModalMessage(passwordValidationResult.messages.join('\n- '));
             setModalIcon('alert-circle-outline');
             setModalIconColor('#FFC107');
             setModalVisible(true);
             setIsLoading(false);
             return;
         }
+
         if (!isChecked) {
             setModalTitle('Terms & Conditions');
             setModalMessage('You must agree to the Terms & Conditions.');
@@ -117,10 +149,11 @@ export default function CreateAccountScreen({ navigation }) {
         try {
             // 1. Create user with Firebase
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
+            
             // 2. Update their profile with the full name
             await updateProfile(userCredential.user, {
-                displayName: fullName
+                displayName: fullName,
+                // You can't store phoneNumber directly in updateProfile, so this would be for a database
             });
 
             setModalTitle('Registration Complete!');
@@ -130,7 +163,6 @@ export default function CreateAccountScreen({ navigation }) {
             setModalVisible(true);
 
         } catch (error) {
-            // Handle Firebase errors with user-friendly messages
             if (error.code === 'auth/email-already-in-use') {
                 setModalTitle('Account Creation Failed');
                 setModalMessage('This email already exists.');
@@ -159,7 +191,7 @@ export default function CreateAccountScreen({ navigation }) {
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <ImageBackground
-                source={require("../assets/header-bg.png")}
+                source={require("../assets/header.png")}
                 style={styles.headerBg}
                 resizeMode="cover"
             >
@@ -168,29 +200,70 @@ export default function CreateAccountScreen({ navigation }) {
             </ImageBackground>
 
             <View style={styles.formContainer}>
-
-                <View style={[
-                    styles.inputContainer,
-                    focusedInput === 'fullName' && styles.focusedInputContainer
-                ]}>
-                    <Icon name="account-outline" size={20} color="#A1866F" style={styles.icon} />
+                <View style={styles.nameInputRow}>
+                    <View style={[styles.inputContainer, focusedInput === 'firstName' && styles.focusedInputContainer, styles.firstNameInput]}>
+                        <Icon name="account-outline" size={20} color="#A1866F" style={styles.icon} />
+                        <TextInput 
+                            placeholder="First Name *" 
+                            style={styles.textInput} 
+                            value={firstName} 
+                            onChangeText={setFirstName} 
+                            onFocus={() => setFocusedInput('firstName')}
+                            onBlur={() => setFocusedInput(null)}
+                        />
+                    </View>
+                    <View style={[styles.inputContainer, focusedInput === 'middleInitial' && styles.focusedInputContainer, styles.middleInitialInput]}>
+                        <TextInput 
+                            placeholder="MI" 
+                            style={styles.textInput} 
+                            value={middleInitial} 
+                            onChangeText={setMiddleInitial} 
+                            onFocus={() => setFocusedInput('middleInitial')}
+                            onBlur={() => setFocusedInput(null)}
+                            maxLength={1}
+                        />
+                    </View>
+                    <View style={[styles.inputContainer, focusedInput === 'lastName' && styles.focusedInputContainer, styles.lastNameInput]}>
+                        <TextInput 
+                            placeholder="Last Name *" 
+                            style={styles.textInput} 
+                            value={lastName} 
+                            onChangeText={setLastName} 
+                            onFocus={() => setFocusedInput('lastName')}
+                            onBlur={() => setFocusedInput(null)}
+                        />
+                    </View>
+                </View>
+                
+                <View style={[styles.inputContainer, focusedInput === 'phoneNumber' && styles.focusedInputContainer]}>
+                    <Icon name="phone-outline" size={20} color="#A1866F" style={styles.icon} />
                     <TextInput 
-                        placeholder="Full Name" 
+                        placeholder="Phone Number *" 
                         style={styles.textInput} 
-                        value={fullName} 
-                        onChangeText={setFullName} 
-                        onFocus={() => setFocusedInput('fullName')}
+                        value={phoneNumber} 
+                        onChangeText={setPhoneNumber} 
+                        keyboardType="phone-pad"
+                        onFocus={() => setFocusedInput('phoneNumber')}
+                        onBlur={() => setFocusedInput(null)}
+                    />
+                </View>
+                
+                <View style={[styles.inputContainer, focusedInput === 'address' && styles.focusedInputContainer]}>
+                    <Icon name="map-marker-outline" size={20} color="#A1866F" style={styles.icon} />
+                    <TextInput 
+                        placeholder="Address *" 
+                        style={styles.textInput} 
+                        value={address} 
+                        onChangeText={setAddress} 
+                        onFocus={() => setFocusedInput('address')}
                         onBlur={() => setFocusedInput(null)}
                     />
                 </View>
 
-                <View style={[
-                    styles.inputContainer,
-                    focusedInput === 'email' && styles.focusedInputContainer
-                ]}>
+                <View style={[styles.inputContainer, focusedInput === 'email' && styles.focusedInputContainer]}>
                     <Icon name="email-outline" size={20} color="#A1866F" style={styles.icon} />
                     <TextInput 
-                        placeholder="Email" 
+                        placeholder="Email *" 
                         style={styles.textInput} 
                         keyboardType="email-address" 
                         value={email} 
@@ -201,13 +274,10 @@ export default function CreateAccountScreen({ navigation }) {
                     />
                 </View>
 
-                <View style={[
-                    styles.inputContainer,
-                    focusedInput === 'password' && styles.focusedInputContainer
-                ]}>
+                <View style={[styles.inputContainer, focusedInput === 'password' && styles.focusedInputContainer]}>
                     <Icon name="lock-outline" size={20} color="#A1866F" style={styles.icon} />
                     <TextInput
-                        placeholder="Password"
+                        placeholder="Password *"
                         secureTextEntry={!passwordVisible}
                         style={styles.textInput}
                         value={password}
@@ -220,13 +290,10 @@ export default function CreateAccountScreen({ navigation }) {
                     </TouchableOpacity>
                 </View>
 
-                <View style={[
-                    styles.inputContainer,
-                    focusedInput === 'confirmPassword' && styles.focusedInputContainer
-                ]}>
+                <View style={[styles.inputContainer, focusedInput === 'confirmPassword' && styles.focusedInputContainer]}>
                     <Icon name="lock-check-outline" size={20} color="#A1866F" style={styles.icon} />
                     <TextInput
-                        placeholder="Confirm Password"
+                        placeholder="Confirm Password *"
                         secureTextEntry={!confirmPasswordVisible}
                         style={styles.textInput}
                         value={confirmPassword}
@@ -238,17 +305,20 @@ export default function CreateAccountScreen({ navigation }) {
                         <Icon name={confirmPasswordVisible ? 'eye-outline' : 'eye-off-outline'} size={20} color="#A1866F" />
                     </TouchableOpacity>
                 </View>
-
+                
+                {/* *** THIS IS THE FIX *** The `View` containing the two `Text` components needs to be replaced
+                  with a single `Text` component that nests the other one.
+                */}
                 <View style={styles.checkboxContainer}>
                     <CheckBox
                         value={isChecked}
                         onValueChange={setChecked}
                         color={isChecked ? '#A1866F' : undefined}
                     />
-                    <View style={{ flexDirection: 'row' }}>
-                        <Text style={styles.agreeWithText}>Agree with </Text>
+                    <Text style={styles.agreeWithText}>
+                        Agree with{' '}
                         <Text style={styles.termsAndConditionText}>Terms & Condition</Text>
-                    </View>
+                    </Text>
                 </View>
 
                 <TouchableOpacity
@@ -300,23 +370,40 @@ const styles = StyleSheet.create({
     },
     formContainer: {
         paddingHorizontal: 20,
-        paddingTop: 12,
+        paddingTop: 5,
+        paddingBottom: 20, // Added padding to the bottom
+    },
+    nameInputRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
     },
     inputContainer: {
         flexDirection: "row",
         alignItems: "center",
-        width: "100%",
         height: 50,
-        // Added a new border property for focus effect
         borderWidth: 1.5, 
         borderColor: "#F5F5F5",
         backgroundColor: "#F5F5F5",
         borderRadius: 8,
         paddingHorizontal: 10,
-        marginTop: 15,
+        marginTop: 8,
+    },
+    firstNameInput: {
+        flex: 1,
+        marginRight: 8,
+    },
+    middleInitialInput: {
+        width: 50,
+        marginRight: 8,
+        justifyContent: 'center',
+        paddingHorizontal: 0,
+    },
+    lastNameInput: {
+        flex: 1,
     },
     focusedInputContainer: {
-        borderColor: '#A68B69', // Highlight color when focused
+        borderColor: '#A68B69',
     },
     icon: {
         marginRight: 8,

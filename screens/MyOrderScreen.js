@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -8,12 +8,13 @@ import BottomNavigationBar from '../components/BottomNavigationBar';
 
 export default function MyOrderScreen() {
     const navigation = useNavigation();
+    const [activeTab, setActiveTab] = useState('completed');
 
     // Load fonts
     const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold, });
     const [montserratLoaded] = useMontserrat({ Montserrat_400Regular, Montserrat_600SemiBold });
 
-    // Dummy data for completed orders
+    // Dummy data for different order statuses
     const completedOrders = [
         {
             id: '1',
@@ -21,7 +22,8 @@ export default function MyOrderScreen() {
             size: '60.2" x 51.2"',
             price: '2,000',
             total: '2,250',
-            image: require('../assets/WelcomeScreen/mirror1.png'), // Placeholder image
+            image: require('../assets/WelcomeScreen/mirror1.png'),
+            status: 'completed',
         },
         {
             id: '2',
@@ -29,23 +31,32 @@ export default function MyOrderScreen() {
             size: '20.2" x 30.2"',
             price: '2,000',
             total: '2,250',
-            image: require('../assets/WelcomeScreen/mirror2.png'), // Placeholder image
+            image: require('../assets/WelcomeScreen/mirror2.png'),
+            status: 'completed',
         },
+    ];
+
+    const processingOrders = [
         {
             id: '3',
             name: 'Irregular Mirror',
             size: '60.2" x 51.2"',
             price: '2,000',
             total: '2,250',
-            image: require('../assets/WelcomeScreen/mirror3.png'), // Placeholder image
+            image: require('../assets/WelcomeScreen/mirror3.png'),
+            status: 'processing',
         },
+    ];
+    
+    const cancelledOrders = [
         {
             id: '4',
             name: 'Grid Mirror',
             size: '60.2" x 51.2"',
             price: '2,000',
             total: '2,250',
-            image: require('../assets/mirror4.png'), // Placeholder image
+            image: require('../assets/home/mirror1.png'),
+            status: 'cancelled',
         },
     ];
 
@@ -53,20 +64,65 @@ export default function MyOrderScreen() {
         return null;
     }
 
-    const OrderItem = ({ order }) => (
-        <View style={styles.orderItemContainer}>
-            <Image source={order.image} style={styles.orderImage} />
-            <View style={styles.orderTextContainer}>
-                <Text style={styles.orderTitle}>{order.name}</Text>
-                <Text style={styles.orderSize}>Size: {order.size}</Text>
-                <Text style={styles.orderPrice}>₱ {order.price}</Text>
-                <Text style={styles.orderTotal}>Total 1 item: ₱ {order.total}</Text>
+    const OrderItem = ({ order }) => {
+        let tagColor;
+        let tagText;
+        let buttonText = 'Buy Again';
+        let buttonColor = '#A68B69';
+        
+        // Conditional styling based on the order status
+        switch (order.status) {
+            case 'completed':
+                tagColor = '#66BB6A';
+                tagText = 'Completed';
+                break;
+            case 'processing':
+                tagColor = '#FFA500';
+                tagText = 'Processing';
+                buttonText = 'Track Order';
+                buttonColor = '#A68B69';
+                break;
+            case 'cancelled':
+                tagColor = '#F44336';
+                tagText = 'Cancelled';
+                buttonText = 'Order Again';
+                buttonColor = '#F44336';
+                break;
+        }
+
+        return (
+            <View style={styles.orderItemContainer}>
+                <Image source={order.image} style={styles.orderImage} />
+                <View style={styles.orderTextContainer}>
+                    <Text style={styles.orderTitle}>{order.name}</Text>
+                    <Text style={styles.orderSize}>Size: {order.size}</Text>
+                    <Text style={styles.orderPrice}>₱ {order.price}</Text>
+                    <Text style={styles.orderTotal}>Total 1 item: ₱ {order.total}</Text>
+                </View>
+                <View style={styles.tagAndButtonContainer}>
+                    <View style={[styles.statusTag, { backgroundColor: tagColor }]}>
+                        <Text style={styles.statusTagText}>{tagText}</Text>
+                    </View>
+                    <TouchableOpacity style={[styles.buyAgainButton, { backgroundColor: buttonColor }]}>
+                        <Text style={styles.buyAgainButtonText}>{buttonText}</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-            <TouchableOpacity style={styles.buyAgainButton}>
-                <Text style={styles.buyAgainButtonText}>Buy Again</Text>
-            </TouchableOpacity>
-        </View>
-    );
+        );
+    };
+    
+    const getOrdersForTab = () => {
+        switch (activeTab) {
+            case 'completed':
+                return completedOrders;
+            case 'processing':
+                return processingOrders;
+            case 'cancelled':
+                return cancelledOrders;
+            default:
+                return [];
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -83,16 +139,28 @@ export default function MyOrderScreen() {
 
             {/* Tabs */}
             <View style={styles.tabsContainer}>
-                <TouchableOpacity style={styles.activeTab}>
-                    <Text style={styles.activeTabText}>Completed</Text>
+                <TouchableOpacity 
+                    style={[styles.tab, activeTab === 'processing' && styles.activeTab]}
+                    onPress={() => setActiveTab('processing')}
+                >
+                    <Text style={[styles.tabText, activeTab === 'processing' && styles.activeTabText]}>Processing</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.inactiveTab}>
-                    <Text style={styles.inactiveTabText}>Cancelled</Text>
+                <TouchableOpacity 
+                    style={[styles.tab, activeTab === 'completed' && styles.activeTab]}
+                    onPress={() => setActiveTab('completed')}
+                >
+                    <Text style={[styles.tabText, activeTab === 'completed' && styles.activeTabText]}>Completed</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                    style={[styles.tab, activeTab === 'cancelled' && styles.activeTab]}
+                    onPress={() => setActiveTab('cancelled')}
+                >
+                    <Text style={[styles.tabText, activeTab === 'cancelled' && styles.activeTabText]}>Cancelled</Text>
                 </TouchableOpacity>
             </View>
 
             <ScrollView contentContainerStyle={styles.contentContainer}>
-                {completedOrders.map((order) => (
+                {getOrdersForTab().map((order) => (
                     <OrderItem key={order.id} order={order} />
                 ))}
             </ScrollView>
@@ -129,23 +197,21 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
         backgroundColor: '#A68B69',
     },
-    activeTab: {
-        paddingHorizontal: 20,
+    tab: {
+        paddingHorizontal: 15,
         paddingVertical: 10,
+    },
+    activeTab: {
         borderBottomWidth: 2,
         borderBottomColor: '#fff',
     },
-    inactiveTab: {
-        paddingHorizontal: 20,
-        paddingVertical: 10,
+    tabText: {
+        fontFamily: 'Montserrat_400Regular',
+        color: '#D4C7B8',
     },
     activeTabText: {
         fontFamily: 'Montserrat_600SemiBold',
         color: '#fff',
-    },
-    inactiveTabText: {
-        fontFamily: 'Montserrat_400Regular',
-        color: '#D4C7B8',
     },
     contentContainer: {
         padding: 20,
@@ -195,8 +261,22 @@ const styles = StyleSheet.create({
         color: '#777',
         marginTop: 2,
     },
+    tagAndButtonContainer: {
+        alignItems: 'flex-end',
+    },
+    statusTag: {
+        borderRadius: 15,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        marginBottom: 10,
+    },
+    statusTagText: {
+        fontFamily: 'Montserrat_600SemiBold',
+        fontSize: 10,
+        color: '#fff',
+        textTransform: 'uppercase',
+    },
     buyAgainButton: {
-        backgroundColor: '#A68B69',
         borderRadius: 20,
         paddingHorizontal: 15,
         paddingVertical: 8,

@@ -14,7 +14,6 @@ const { width } = Dimensions.get('window');
  */
 const BottomNavigationBar = ({ navigation }) => {
   const route = useRoute();
-  
   const navItems = [
     { name: 'home', icon: 'home-outline', activeIcon: 'home', screen: 'Home' },
     { name: 'categories', icon: 'contrast-outline', activeIcon: 'contrast', screen: 'CategoryScreen' },
@@ -22,9 +21,7 @@ const BottomNavigationBar = ({ navigation }) => {
     { name: 'cart', icon: 'cart-outline', activeIcon: 'cart', screen: 'CartScreen' },
     { name: 'account', icon: 'person-outline', activeIcon: 'person', screen: 'ProfileScreen' },
   ];
-
   const insets = useSafeAreaInsets();
-
   const handlePress = (item) => {
     if (item.screen && navigation) {
       navigation.navigate(item.screen);
@@ -44,10 +41,6 @@ const BottomNavigationBar = ({ navigation }) => {
             size={26}
             color={route.name === item.screen ? '#A68B69' : 'gray'}
           />
-          {/* ✅ Wrap nav label in <Text> if you want to display it */}
-          {/* <Text style={{ fontSize: 10, color: route.name === item.screen ? '#A68B69' : 'gray' }}>
-            {item.name}
-          </Text> */}
         </TouchableOpacity>
       ))}
     </View>
@@ -59,7 +52,8 @@ const BottomNavigationBar = ({ navigation }) => {
  */
 export default function CategoryScreen() {
   const navigation = useNavigation();
-  
+  const insets = useSafeAreaInsets(); // Import and use safe area insets
+
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   const [leagueSpartanLoaded] = useLeagueSpartan({
@@ -72,7 +66,7 @@ export default function CategoryScreen() {
   });
 
   const categories = [
-      { id: '1', name: 'Irregular Mirror', image: require('../assets/Category/irregular.png') },
+    { id: '1', name: 'Irregular Mirror', image: require('../assets/Category/irregular.png') },
     { id: '2', name: 'Capsule Mirror', image: require('../assets/Category/capsule_3.png') },
     { id: '3', name: 'Grid Mirror', image: require('../assets/Category/grid.png') },
     { id: '4', name: 'Arch Mirror', image: require('../assets/Category/arch.png') },
@@ -82,16 +76,15 @@ export default function CategoryScreen() {
   if (!leagueSpartanLoaded || !montserratLoaded) {
     return null;
   }
-  
+
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Icon name="chevron-left" size={30} color="#000" />
         </TouchableOpacity>
         <Text style={styles.title}>Category</Text>
-        {/* ✅ Spacer is an empty View, no strings inside */}
         <View style={{ width: 30 }} />
       </View>
 
@@ -104,7 +97,7 @@ export default function CategoryScreen() {
         renderItem={({ item }) => {
           const isSelected = selectedCategory === item.id;
           return (
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[
                 styles.itemContainer,
                 isSelected && styles.selectedItemContainer,
@@ -115,19 +108,18 @@ export default function CategoryScreen() {
               }}
             >
               <Image source={item.image} style={styles.itemImage} />
-              {isSelected && (
-                <View style={styles.itemOverlay}>
-                  <View style={styles.selectedItemCircle}>
-                    <Text style={styles.selectedItemText}>{item.name}</Text>
-                  </View>
+              <View style={styles.itemOverlay}>
+                <View style={styles.itemCircle}>
+                  <Text style={styles.itemText}>{item.name}</Text>
                 </View>
-              )}
+              </View>
+              {isSelected && <View style={styles.darkOverlay} />}
             </TouchableOpacity>
           );
         }}
         ListFooterComponent={() => (
           <View style={styles.centeredItemContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[
                 styles.itemContainer,
                 selectedCategory === '5' && styles.selectedItemContainer,
@@ -138,13 +130,12 @@ export default function CategoryScreen() {
               }}
             >
               <Image source={categories[4].image} style={styles.itemImage} />
-              {selectedCategory === '5' && (
-                <View style={styles.itemOverlay}>
-                  <View style={styles.selectedItemCircle}>
-                    <Text style={styles.selectedItemText}>{categories[4].name}</Text>
-                  </View>
+              <View style={styles.itemOverlay}>
+                <View style={styles.itemCircle}>
+                  <Text style={styles.itemText}>{categories[4].name}</Text>
                 </View>
-              )}
+              </View>
+              {selectedCategory === '5' && <View style={styles.darkOverlay} />}
             </TouchableOpacity>
           </View>
         )}
@@ -166,7 +157,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 30,
     paddingBottom: 10,
   },
   backButton: {
@@ -211,9 +201,8 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.3)',
   },
-  selectedItemCircle: {
+  itemCircle: {
     width: 120,
     height: 120,
     borderRadius: 60,
@@ -221,12 +210,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  selectedItemText: {
+  itemText: {
     fontFamily: 'Montserrat_600SemiBold',
     fontSize: 14,
     color: '#000',
     textAlign: 'center',
     paddingHorizontal: 10,
+  },
+  darkOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.3)',
   },
   bottomNav: {
     flexDirection: 'row',

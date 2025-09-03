@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, FlatList, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, FlatList, TextInput, Modal, Dimensions } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
 import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_600SemiBold } from "@expo-google-fonts/montserrat";
+
+const { width } = Dimensions.get('window');
 
 export default function CheckoutScreen() {
     const navigation = useNavigation();
@@ -19,11 +21,14 @@ export default function CheckoutScreen() {
 
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('bankTransfer');
     const [cartItems, setCartItems] = useState([
-        { id: '1', name: 'Floor Standing Mirror', size: "60.2\" x 51.2\"", price: 2000, quantity: 1, image: require('../assets/mirror4.png') },
+        { id: '1', name: 'Floor Standing Mirror', size: "60.2\" x 51.2\"", price: 2000, quantity: 1, image: require('../assets/home/mirror1.png') },
     ]);
 
     // State to control the visibility of the new card form
     const [showNewCardForm, setShowNewCardForm] = useState(false);
+    
+    // State to control order confirmation modal
+    const [orderConfirmationVisible, setOrderConfirmationVisible] = useState(false);
 
     if (!leagueSpartanLoaded || !montserratLoaded) {
         return null;
@@ -34,7 +39,13 @@ export default function CheckoutScreen() {
     const total = subtotal + deliveryFee;
 
     const handlePlaceOrder = () => {
-        navigation.navigate('OrderConfirmationScreen');
+        setOrderConfirmationVisible(true);
+    };
+
+    const handleContinue = () => {
+        setOrderConfirmationVisible(false);
+        // Navigate to home or orders screen
+        navigation.navigate('Home'); // Adjust navigation as needed
     };
 
     const renderCheckoutItem = ({ item }) => (
@@ -85,6 +96,64 @@ export default function CheckoutScreen() {
             </View>
         );
     };
+
+    // Order Confirmation Modal Component
+    const OrderConfirmationModal = () => (
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={orderConfirmationVisible}
+            onRequestClose={() => setOrderConfirmationVisible(false)}
+        >
+            <View style={styles.modalOverlay}>
+                <View style={styles.modalContainer}>
+                    <View style={styles.successIconContainer}>
+                        <Icon name="check-circle" size={80} color="#4CAF50" />
+                    </View>
+                    
+                    <Text style={styles.confirmationTitle}>Order Confirmed!</Text>
+                    <Text style={styles.confirmationMessage}>
+                        Thank you for your purchase. Your order has been successfully placed.
+                    </Text>
+
+                    <View style={styles.orderDetailsContainer}>
+                        <Text style={styles.orderDetailsTitle}>Order Summary</Text>
+                        
+                        <View style={styles.orderDetailRow}>
+                            <Text style={styles.orderDetailLabel}>Item Ordered:</Text>
+                            <Text style={styles.orderDetailValue}>Floor Standing Mirror x1</Text>
+                        </View>
+                        
+                        <View style={styles.orderDetailRow}>
+                            <Text style={styles.orderDetailLabel}>Total:</Text>
+                            <Text style={styles.orderDetailValue}>₱ {total.toLocaleString()}</Text>
+                        </View>
+                        
+                        <View style={styles.orderDetailRow}>
+                            <Text style={styles.orderDetailLabel}>Delivery Address:</Text>
+                            <Text style={styles.orderDetailValue}>123 Tonying Street, Mactan Proper</Text>
+                        </View>
+                        
+                        <View style={styles.orderDetailRow}>
+                            <Text style={styles.orderDetailLabel}>Payment Method:</Text>
+                            <Text style={styles.orderDetailValue}>Bank Transfer</Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.paymentNotice}>
+                        <Icon name="information-outline" size={20} color="#FF9800" />
+                        <Text style={styles.paymentNoticeText}>
+                            Please complete your 50% down payment within 24 hours to confirm your order.
+                        </Text>
+                    </View>
+
+                    <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+                        <Text style={styles.continueButtonText}>Continue</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </Modal>
+    );
 
     return (
         <View style={styles.container}>
@@ -173,6 +242,8 @@ export default function CheckoutScreen() {
                     <Text style={styles.placeOrderButtonText}>Place Order</Text>
                 </TouchableOpacity>
             </View>
+
+            <OrderConfirmationModal />
         </View>
     );
 }
@@ -202,7 +273,6 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 20,
         paddingVertical: 10,
-        // The key change to make the "Add new card" section visible
         paddingBottom: 100,
     },
     sectionContainer: {
@@ -458,4 +528,113 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#fff',
     },
-}); 
+    // Modal Styles
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+    },
+    modalContainer: {
+        backgroundColor: '#fff',
+        borderRadius: 24,
+        padding: 32,
+        width: width - 40,
+        maxWidth: 400,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 16 },
+        shadowOpacity: 0.3,
+        shadowRadius: 32,
+        elevation: 16,
+    },
+    successIconContainer: {
+        marginBottom: 24,
+        backgroundColor: '#E8F5E8',
+        borderRadius: 50,
+        padding: 20,
+    },
+    confirmationTitle: {
+        fontFamily: 'LeagueSpartan_700Bold',
+        fontSize: 28,
+        color: '#333',
+        marginBottom: 12,
+        textAlign: 'center',
+    },
+    confirmationMessage: {
+        fontFamily: 'Montserrat_400Regular',
+        fontSize: 16,
+        color: '#666',
+        textAlign: 'center',
+        lineHeight: 24,
+        marginBottom: 24,
+    },
+    orderDetailsContainer: {
+        width: '100%',
+        backgroundColor: '#F8F8F8',
+        borderRadius: 16,
+        padding: 20,
+        marginBottom: 20,
+    },
+    orderDetailsTitle: {
+        fontFamily: 'Montserrat_600SemiBold',
+        fontSize: 18,
+        color: '#333',
+        marginBottom: 16,
+        textAlign: 'center',
+    },
+    orderDetailRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: 12,
+    },
+    orderDetailLabel: {
+        fontFamily: 'Montserrat_400Regular',
+        fontSize: 14,
+        color: '#666',
+        flex: 1,
+    },
+    orderDetailValue: {
+        fontFamily: 'Montserrat_600SemiBold',
+        fontSize: 14,
+        color: '#333',
+        flex: 1,
+        textAlign: 'right',
+    },
+    paymentNotice: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        backgroundColor: '#FFF3E0',
+        padding: 16,
+        borderRadius: 12,
+        marginBottom: 24,
+        width: '100%',
+    },
+    paymentNoticeText: {
+        fontFamily: 'Montserrat_400Regular',
+        fontSize: 14,
+        color: '#E65100',
+        marginLeft: 12,
+        flex: 1,
+        lineHeight: 20,
+    },
+    continueButton: {
+        backgroundColor: '#A68B69',
+        borderRadius: 16,
+        paddingVertical: 16,
+        paddingHorizontal: 48,
+        shadowColor: '#A68B69',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    continueButtonText: {
+        fontFamily: 'Montserrat_600SemiBold',
+        fontSize: 16,
+        color: '#fff',
+        textAlign: 'center',
+    },
+});

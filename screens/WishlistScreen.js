@@ -9,12 +9,11 @@ const { width } = Dimensions.get('window');
 
 // Placeholder data for your wishlist items
 const wishlistItems = [
-    { id: '1', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png'), category: 'Today' },
-    { id: '2', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png'), category: 'Today' },
-    { id: '3', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png'), category: 'Yesterday' },
-    { id: '4', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png'), category: 'Yesterday' },
-    { id: '5', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png'), category: 'Yesterday' },
-    { id: '6', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png'), category: 'Yesterday' },
+    { id: '1', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/home/mirror1.png'), category: 'Today' },
+    { id: '2', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/home/mirror1.png'), category: 'Today' },
+    { id: '3', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/home/mirror1.png'), category: 'Yesterday' },
+    { id: '4', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/home/mirror1.png'), category: 'Yesterday' },
+
 ];
 
 export default function WishlistScreen() {

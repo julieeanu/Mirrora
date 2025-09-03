@@ -36,17 +36,17 @@ export default function HomeScreen() {
 
     // Placeholder data for products
     const popularProducts = [
-        { id: '1', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png')},
-        { id: '2', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png')},
-        { id: '3', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png')},
-        { id: '4', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/mirror4.png')},
+        { id: '1', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/home/mirror1.png')},
+        { id: '2', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/home/mirror2.png')},
+        { id: '3', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/home/mirror3.png')},
+        { id: '4', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/home/mirror4.png')},
     ];
     
     // Placeholder images - you should replace these with your actual assets
     const banners = [
-        require('../assets/banner.png'),
-        require('../assets/banner.png'),
-        require('../assets/banner.png'),
+        require('../assets/home/banner.png'),
+        require('../assets/home/banner.png'),
+        require('../assets/home/banner.png'),
     ];
     
     const renderHeader = () => (
@@ -119,10 +119,7 @@ export default function HomeScreen() {
 
             {/* Most Popular Section Header */}
             <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>All</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('CategoryScreen', { category: 'Most Popular' })}>
-                    <Text style={styles.seeAllText}>See All</Text>
-                </TouchableOpacity>
+                <Text style={styles.sectionTitle}>Most Popular</Text>
             </View>
         </>
     );
@@ -279,7 +276,7 @@ const styles = StyleSheet.create({
     },
     sectionHeader: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-end',
         alignItems: 'center',
         paddingHorizontal: 20,
         marginTop: 25,
