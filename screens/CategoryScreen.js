@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Dimensions, FlatList } from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Image, 
+  Dimensions, 
+  FlatList 
+} from 'react-native';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -10,10 +18,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const { width } = Dimensions.get('window');
 
 /**
- * The BottomNavigationBar component.
+ * Bottom Navigation Bar
  */
 const BottomNavigationBar = ({ navigation }) => {
   const route = useRoute();
+  const insets = useSafeAreaInsets();
+
   const navItems = [
     { name: 'home', icon: 'home-outline', activeIcon: 'home', screen: 'Home' },
     { name: 'categories', icon: 'contrast-outline', activeIcon: 'contrast', screen: 'CategoryScreen' },
@@ -21,7 +31,7 @@ const BottomNavigationBar = ({ navigation }) => {
     { name: 'cart', icon: 'cart-outline', activeIcon: 'cart', screen: 'CartScreen' },
     { name: 'account', icon: 'person-outline', activeIcon: 'person', screen: 'ProfileScreen' },
   ];
-  const insets = useSafeAreaInsets();
+
   const handlePress = (item) => {
     if (item.screen && navigation) {
       navigation.navigate(item.screen);
@@ -31,9 +41,9 @@ const BottomNavigationBar = ({ navigation }) => {
   return (
     <View style={[styles.bottomNav, { paddingBottom: insets.bottom }]}>
       {navItems.map((item) => (
-        <TouchableOpacity
-          key={item.name}
-          style={styles.navItem}
+        <TouchableOpacity 
+          key={item.name} 
+          style={styles.navItem} 
           onPress={() => handlePress(item)}
         >
           <Ionicons
@@ -48,21 +58,19 @@ const BottomNavigationBar = ({ navigation }) => {
 };
 
 /**
- * The Category screen component.
+ * Category Screen
  */
 export default function CategoryScreen() {
   const navigation = useNavigation();
-  const insets = useSafeAreaInsets(); // Import and use safe area insets
+  const insets = useSafeAreaInsets();
 
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const [leagueSpartanLoaded] = useLeagueSpartan({
-    LeagueSpartan_700Bold,
-  });
-
+  // Fonts
+  const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold });
   const [montserratLoaded] = useMontserrat({
     Montserrat_400Regular,
-    Montserrat_600SemiBold
+    Montserrat_600SemiBold,
   });
 
   const categories = [
@@ -73,9 +81,7 @@ export default function CategoryScreen() {
     { id: '5', name: 'Round Mirror', image: require('../assets/Category/round.png') },
   ];
 
-  if (!leagueSpartanLoaded || !montserratLoaded) {
-    return null;
-  }
+  if (!leagueSpartanLoaded || !montserratLoaded) return null;
 
   return (
     <View style={styles.container}>
@@ -88,7 +94,7 @@ export default function CategoryScreen() {
         <View style={{ width: 30 }} />
       </View>
 
-      {/* Grid of category items */}
+      {/* Category Grid */}
       <FlatList
         data={categories.slice(0, 4)}
         keyExtractor={item => item.id}
@@ -98,10 +104,7 @@ export default function CategoryScreen() {
           const isSelected = selectedCategory === item.id;
           return (
             <TouchableOpacity
-              style={[
-                styles.itemContainer,
-                isSelected && styles.selectedItemContainer,
-              ]}
+              style={[styles.itemContainer, isSelected && styles.selectedItemContainer]}
               onPress={() => {
                 setSelectedCategory(item.id);
                 navigation.navigate('ProductListScreen', { categoryName: item.name });
@@ -141,17 +144,16 @@ export default function CategoryScreen() {
         )}
       />
 
-      {/* Bottom Navigation Bar */}
+      {/* Bottom Navigation */}
       <BottomNavigationBar navigation={navigation} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9F9F9',
-  },
+  container: { flex: 1, backgroundColor: '#F9F9F9' },
+
+  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -159,18 +161,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 10,
   },
-  backButton: {
-    padding: 5,
-  },
+  backButton: { padding: 5 },
   title: {
     fontFamily: 'LeagueSpartan_700Bold',
     fontSize: 24,
     color: '#000',
   },
-  row: {
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
-  },
+
+  // Category Grid
+  row: { justifyContent: 'space-between', paddingHorizontal: 15 },
   itemContainer: {
     width: (width - 45) / 2,
     height: 250,
@@ -186,17 +185,12 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   selectedItemContainer: {
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 8,
   },
-  itemImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
+  itemImage: { width: '100%', height: '100%', resizeMode: 'cover' },
   itemOverlay: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
@@ -221,6 +215,9 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.3)',
   },
+  centeredItemContainer: { alignItems: 'center' },
+
+  // Bottom Nav
   bottomNav: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -234,12 +231,5 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  navItem: {
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-  },
-  centeredItemContainer: {
-    alignItems: 'center',
-  },
+  navItem: { alignItems: 'center', paddingVertical: 10, paddingHorizontal: 20 },
 });

@@ -12,6 +12,7 @@
     "@expo-google-fonts/league-spartan": "^0.4.1",
     "@expo-google-fonts/montserrat": "^0.4.1",
     "@expo/metro-runtime": "~5.0.4",
+    "@react-native-async-storage/async-storage": "^1.24.0",
     "@react-native-community/checkbox": "^0.5.20",
     "@react-native-picker/picker": "^2.11.1",
     "@react-navigation/native": "^7.1.17",

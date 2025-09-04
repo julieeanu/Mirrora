@@ -1,13 +1,20 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Image, ImageBackground, FlatList, Dimensions, Platform } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { 
+    View, 
+    Text, 
+    StyleSheet, 
+    TextInput, 
+    TouchableOpacity, 
+    Image, 
+    ImageBackground, 
+    FlatList, 
+    Dimensions
+} from 'react-native';
 import { useNavigation } from "@react-navigation/native";
-// Using MaterialCommunityIcons for consistent styling with your other screens
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
-// Import the new BottomNavigationBar component
 import BottomNavigationBar from '../components/BottomNavigationBar';
 
-// ✅ Font imports
 import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
 import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_600SemiBold } from "@expo-google-fonts/montserrat";
 
@@ -15,11 +22,10 @@ const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
     const navigation = useNavigation();
+    const bannerRef = useRef(null);
 
-    // ✅ Banner scroll state
     const [activeBanner, setActiveBanner] = useState(0);
     
-    // ✅ Load fonts
     const [leagueSpartanLoaded] = useLeagueSpartan({
         LeagueSpartan_700Bold,
     });
@@ -30,31 +36,74 @@ export default function HomeScreen() {
     });
 
     if (!leagueSpartanLoaded || !montserratLoaded) {
-        return null; // Wait for fonts to load
+        return null;
     }
 
-
-    // Placeholder data for products
+    // Updated banner data to include all three banners
+    const banners = [
+        {
+            id: '1',
+            image: require('../assets/home/banner2.png'), 
+            title: 'Discover new arrivals and',
+            subtitle: 'find the perfect piece for your home',
+            buttonText: 'Shop Now',
+            titleColor: '#444',
+            subtitleColor: '#666',
+            buttonBg: 'rgba(255, 255, 255, 0.7)',
+            buttonTextColor: '#a17c55',
+        },
+        {
+            id: '2',
+            image: require('../assets/home/banner3.png'), 
+            title: 'A perfect round mirror',
+            subtitle: 'suitable for any living space.',
+            buttonText: 'Add to cart',
+            titleColor: '#fff',
+            subtitleColor: '#fff',
+            buttonBg: 'rgba(255, 255, 255, 0.7)',
+            buttonTextColor: '#A68B69',
+        },
+        {
+            id: '3',
+            image: require('../assets/home/banner1.png'),
+            title: 'Design Your Perfect',
+            subtitle: 'Mirror Today',
+            buttonText: 'Customize Now',
+            titleColor: '#fff',
+            subtitleColor: '#fff',
+            buttonBg: 'rgba(255, 255, 255, 0.7)',
+            buttonTextColor: '#A68B69',
+        },
+    ];
+    
     const popularProducts = [
         { id: '1', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/home/mirror1.png')},
         { id: '2', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/home/mirror2.png')},
         { id: '3', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/home/mirror3.png')},
         { id: '4', name: 'Floor Standing Mirror', price: '₱ 2,000', image: require('../assets/home/mirror4.png')},
     ];
-    
-    // Placeholder images - you should replace these with your actual assets
-    const banners = [
-        require('../assets/home/banner.png'),
-        require('../assets/home/banner.png'),
-        require('../assets/home/banner.png'),
-    ];
+
+    // Handle banner scroll with improved logic
+    const handleBannerScroll = (event) => {
+        const slideSize = width - 40; // Same as banner width
+        const index = Math.round(event.nativeEvent.contentOffset.x / slideSize);
+        setActiveBanner(index);
+    };
+
+    // Handle dot press to scroll to specific banner
+    const handleDotPress = (index) => {
+        setActiveBanner(index);
+        bannerRef.current?.scrollToIndex({
+            index,
+            animated: true,
+        });
+    };
     
     const renderHeader = () => (
         <>
             {/* Header Section */}
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Mirrora Philippines</Text>
-                {/* Updated onPress to navigate to MessageScreen */}
                 <TouchableOpacity onPress={() => navigation.navigate('MessageScreen')}>
                     <Icon name="chat-processing" size={24} color="#A68B69" />
                 </TouchableOpacity>
@@ -75,44 +124,54 @@ export default function HomeScreen() {
                 </TouchableOpacity>
             </View>
 
-            {/* ✅ Scrollable Banners */}
-            <FlatList
-                data={banners}
-                horizontal
-                pagingEnabled
-                showsHorizontalScrollIndicator={false}
-                keyExtractor={(item, index) => index.toString()}
-                onScroll={(event) => {
-                    const index = Math.round(
-                        event.nativeEvent.contentOffset.x / event.nativeEvent.layoutMeasurement.width
-                    );
-                    setActiveBanner(index);
-                }}
-                style={styles.bannerList}
-                renderItem={({ item }) => (
-                    <ImageBackground
-                        source={item}
-                        style={styles.banner}
-                        imageStyle={styles.bannerImageStyle}
-                    >
-                        <View style={styles.bannerContent}>
-                            <Text style={styles.bannerText}>Design Your Perfect</Text>
-                            <Text style={[styles.bannerText, { color: '#fff' }]}>Mirror Today</Text>
-                            <Text style={[styles.bannerSubtext, { color: '#fff' }]}>Crafted Just for You!</Text>
-                            <TouchableOpacity style={styles.customizeButton}>
-                                <Text style={styles.customizeButtonText}>Customize Now</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </ImageBackground>
-                )}
-            />
+            {/* Scrollable Banners Container */}
+            <View style={styles.bannerContainer}>
+                <FlatList
+                    ref={bannerRef}
+                    data={banners}
+                    horizontal
+                    pagingEnabled
+                    showsHorizontalScrollIndicator={false}
+                    keyExtractor={item => item.id}
+                    decelerationRate="fast"
+                    snapToInterval={width}
+                    snapToAlignment="center"
+                    onViewableItemsChanged={({ viewableItems }) => {
+                        if (viewableItems.length > 0) {
+                            setActiveBanner(viewableItems[0].index);
+                        }
+                    }}
+                    contentContainerStyle={styles.bannerList}
+                    getItemLayout={(data, index) => ({
+                        length: width - 40,
+                        offset: (width - 40) * index,
+                        index,
+                    })}
+                    renderItem={({ item }) => (
+                        <ImageBackground
+                            source={item.image}
+                            style={styles.banner}
+                            imageStyle={styles.bannerImageStyle}
+                        >
+                            <View style={styles.bannerContent}>
+                                <Text style={[styles.bannerTitle, { color: item.titleColor }]}>{item.title}</Text>
+                                <Text style={[styles.bannerSubtitle, { color: item.subtitleColor }]}>{item.subtitle}</Text>
+                                <TouchableOpacity style={[styles.bannerButton, { backgroundColor: item.buttonBg }]}>
+                                    <Text style={[styles.bannerButtonText, { color: item.buttonTextColor }]}>{item.buttonText}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </ImageBackground>
+                    )}
+                />
+            </View>
 
-            {/* ✅ Dots */}
+            {/* Banner Dots - Now clickable */}
             <View style={styles.bannerDotsContainer}>
                 {banners.map((_, index) => (
-                    <View
+                    <TouchableOpacity
                         key={index}
                         style={[styles.dot, activeBanner === index && styles.activeDot]}
+                        onPress={() => handleDotPress(index)}
                     />
                 ))}
             </View>
@@ -126,7 +185,6 @@ export default function HomeScreen() {
 
     return (
         <View style={styles.container}>
-            {/* Use FlatList as the main scrollable container */}
             <FlatList
                 data={popularProducts}
                 keyExtractor={item => item.id}
@@ -156,8 +214,6 @@ export default function HomeScreen() {
                     </TouchableOpacity>
                 )}
             />
-
-            {/* Render the new BottomNavigationBar component and pass the navigation prop */}
             <BottomNavigationBar navigation={navigation} />
         </View>
     );
@@ -166,11 +222,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // Change the background color to the desired color
         backgroundColor: '#F9F9F9',
-    },
-    scrollContent: {
-        paddingBottom: 80, // Add padding for bottom nav
     },
     header: {
         flexDirection: 'row',
@@ -207,23 +259,25 @@ const styles = StyleSheet.create({
         fontFamily: 'Montserrat_400Regular',
     },
     filterButton: {
-        backgroundColor: 'transparent', // Made the background transparent
+        backgroundColor: 'transparent',
         padding: 8,
         borderRadius: 10,
         marginLeft: 10,
     },
-    bannerList: {
-        // New style for FlatList to control padding
+    bannerContainer: {
         marginTop: 20,
+    },
+    bannerList: {
         paddingHorizontal: 20,
     },
     banner: {
-        width: 320, // Set a fixed width for each banner item
-        height: 150,
+        width: width - 40,
+        height: 180,
         marginRight: 15,
         borderRadius: 15,
         overflow: 'hidden',
         justifyContent: 'center',
+        alignItems: 'flex-start',
         padding: 20,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
@@ -231,38 +285,38 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 5,
     },
+    bannerImageStyle: {
+        borderRadius: 15,
+    },
     bannerContent: {
         width: '60%',
-        padding: 10,
     },
-    bannerText: {
-        fontFamily: 'LeagueSpartan_700Bold',
+    bannerTitle: {
+        fontFamily: 'Montserrat_600SemiBold',
         fontSize: 18,
-        color: '#000',
+        lineHeight: 24,
     },
-    bannerSubtext: {
+    bannerSubtitle: {
         fontFamily: 'Montserrat_400Regular',
-        fontSize: 12,
-        color: '#000',
+        fontSize: 14,
         marginTop: 5,
     },
-    customizeButton: {
-        backgroundColor: 'rgba(255, 255, 255, 0.7)',
-        paddingVertical: 8,
-        paddingHorizontal: 15,
-        borderRadius: 20,
-        marginTop: 10,
+    bannerButton: {
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 30,
+        marginTop: 15,
         alignSelf: 'flex-start',
     },
-    customizeButtonText: {
+    bannerButtonText: {
         fontFamily: 'Montserrat_600SemiBold',
-        fontSize: 12,
-        color: '#A68B69',
+        fontSize: 14,
     },
     bannerDotsContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
         marginTop: 10,
+        paddingVertical: 5,
     },
     dot: {
         width: 8,
@@ -272,6 +326,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 4,
     },
     activeDot: {
+        width: 16,
         backgroundColor: '#A68B69',
     },
     sectionHeader: {
@@ -286,10 +341,6 @@ const styles = StyleSheet.create({
         fontFamily: 'LeagueSpartan_700Bold',
         fontSize: 20,
         color: '#000',
-    },
-    seeAllText: {
-        fontFamily: 'Montserrat_400Regular',
-        color: '#A68B69',
     },
     productRow: {
         justifyContent: 'space-between',
@@ -346,26 +397,5 @@ const styles = StyleSheet.create({
         backgroundColor: '#A68B69',
         padding: 8,
         borderRadius: 20,
-    },
-    bottomNav: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        height: 60,
-        backgroundColor: '#fff',
-        borderTopWidth: 1,
-        borderTopColor: '#f0f0f0',
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-    },
-    navItem: {
-        alignItems: 'center',
-    },
-    navText: {
-        fontFamily: 'Montserrat_400Regular',
-        fontSize: 10,
-        color: '#A68B69',
     },
 });

@@ -1,84 +1,98 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, FlatList } from 'react-native';
+import { 
+    View, 
+    Text, 
+    StyleSheet, 
+    TouchableOpacity, 
+    Image, 
+    FlatList 
+} from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
-import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_600SemiBold } from "@expo-google-fonts/montserrat";
+import { 
+    useFonts as useLeagueSpartan, 
+    LeagueSpartan_700Bold 
+} from "@expo-google-fonts/league-spartan";
+import { 
+    useFonts as useMontserrat, 
+    Montserrat_400Regular, 
+    Montserrat_600SemiBold 
+} from "@expo-google-fonts/montserrat";
 import BottomNavigationBar from '../components/BottomNavigationBar';
 
 export default function CartScreen() {
     const navigation = useNavigation();
 
-    // 
-    const [leagueSpartanLoaded] = useLeagueSpartan({
-        LeagueSpartan_700Bold,
-    });
-
+    // Fonts
+    const [leagueSpartanLoaded] = useLeagueSpartan({ LeagueSpartan_700Bold });
     const [montserratLoaded] = useMontserrat({
         Montserrat_400Regular,
-        Montserrat_600SemiBold
+        Montserrat_600SemiBold,
     });
 
-    // Move the useState hook here, before the conditional return
+    // Cart state
     const [cartItems, setCartItems] = useState([
         { id: '1', name: 'Floor Standing Mirror', size: "60.2\" x 51.2\"", price: 2000, quantity: 1, image: require('../assets/home/mirror1.png'), isSelected: true },
         { id: '2', name: 'Floor Standing Mirror', size: "60.2\" x 51.2\"", price: 2000, quantity: 1, image: require('../assets/home/mirror1.png'), isSelected: false },
         { id: '3', name: 'Floor Standing Mirror', size: "60.2\" x 51.2\"", price: 2000, quantity: 1, image: require('../assets/home/mirror1.png'), isSelected: false },
     ]);
-    
-    // The conditional return is now safe because all hooks have been called
-    if (!leagueSpartanLoaded || !montserratLoaded) {
-        return null; 
-    }
 
-    // ... rest of your component logic
+    if (!leagueSpartanLoaded || !montserratLoaded) return null;
+
+    // Handlers
     const handleSelectAll = () => {
         const allSelected = cartItems.every(item => item.isSelected);
-        const newCartItems = cartItems.map(item => ({ ...item, isSelected: !allSelected }));
-        setCartItems(newCartItems);
+        setCartItems(cartItems.map(item => ({ ...item, isSelected: !allSelected })));
     };
 
     const handleItemSelect = (id) => {
-        const newCartItems = cartItems.map(item =>
+        setCartItems(cartItems.map(item =>
             item.id === id ? { ...item, isSelected: !item.isSelected } : item
-        );
-        setCartItems(newCartItems);
+        ));
     };
 
     const handleQuantityChange = (id, change) => {
-        const newCartItems = cartItems.map(item => {
+        setCartItems(cartItems.map(item => {
             if (item.id === id) {
                 const newQuantity = item.quantity + change;
-                if (newQuantity >= 1) {
-                    return { ...item, quantity: newQuantity };
-                }
+                return newQuantity >= 1 ? { ...item, quantity: newQuantity } : item;
             }
             return item;
-        });
-        setCartItems(newCartItems);
+        }));
     };
 
     const handleRemoveItem = (id) => {
-        const newCartItems = cartItems.filter(item => item.id !== id);
-        setCartItems(newCartItems);
+        setCartItems(cartItems.filter(item => item.id !== id));
     };
 
+    // Derived values
     const selectedItems = cartItems.filter(item => item.isSelected);
-    const totalAmount = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const totalAmount = selectedItems.reduce(
+        (sum, item) => sum + item.price * item.quantity, 
+        0
+    );
 
+    // Render cart item
     const renderCartItem = ({ item }) => (
         <View style={styles.cartItemContainer}>
+            {/* Checkbox */}
             <TouchableOpacity onPress={() => handleItemSelect(item.id)} style={styles.checkboxContainer}>
                 <View style={[styles.checkbox, item.isSelected && styles.checkedCheckbox]}>
                     {item.isSelected && <Icon name="check" size={16} color="#fff" />}
                 </View>
             </TouchableOpacity>
+
+            {/* Product Image */}
             <Image source={item.image} style={styles.cartItemImage} />
+
+            {/* Details */}
             <View style={styles.cartItemDetails}>
                 <Text style={styles.cartItemName}>{item.name}</Text>
                 <Text style={styles.cartItemSize}>{item.size}</Text>
                 <Text style={styles.cartItemPrice}>₱ {item.price.toLocaleString()}</Text>
             </View>
+
+            {/* Quantity + Remove */}
             <View style={styles.quantityContainer}>
                 <TouchableOpacity onPress={() => handleRemoveItem(item.id)}>
                     <Icon name="trash-can-outline" size={20} color="#666" style={styles.trashIcon} />
@@ -109,7 +123,7 @@ export default function CartScreen() {
                 </TouchableOpacity>
             </View>
 
-            {/* Cart Items List */}
+            {/* Cart List */}
             <FlatList
                 data={cartItems}
                 keyExtractor={item => item.id}
@@ -119,13 +133,18 @@ export default function CartScreen() {
 
             {/* Bottom Bar */}
             <View style={styles.bottomBar}>
+                {/* Select All */}
                 <TouchableOpacity onPress={handleSelectAll} style={styles.selectAllContainer}>
-                    <View style={[styles.checkbox, cartItems.every(item => item.isSelected) && styles.checkedCheckbox]}>
+                    <View style={[
+                        styles.checkbox, 
+                        cartItems.every(item => item.isSelected) && styles.checkedCheckbox
+                    ]}>
                         {cartItems.every(item => item.isSelected) && <Icon name="check" size={16} color="#fff" />}
                     </View>
                     <Text style={styles.selectAllText}>All</Text>
                 </TouchableOpacity>
 
+                {/* Total + Checkout */}
                 <View style={styles.totalContainer}>
                     <Text style={styles.totalAmountText}>₱ {totalAmount.toLocaleString()}</Text>
                     <TouchableOpacity 
@@ -146,10 +165,9 @@ export default function CartScreen() {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#F9F9F9',
-    },
+    container: { flex: 1, backgroundColor: '#F9F9F9' },
+    
+    // Header
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -166,10 +184,12 @@ const styles = StyleSheet.create({
         fontSize: 22,
         color: '#000',
     },
+
+    // Cart List
     cartList: {
         paddingTop: 10,
         paddingHorizontal: 20,
-        paddingBottom: 100, // Add padding for the bottom bar
+        paddingBottom: 100,
     },
     cartItemContainer: {
         flexDirection: 'row',
@@ -184,9 +204,7 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 2,
     },
-    checkboxContainer: {
-        paddingRight: 10,
-    },
+    checkboxContainer: { paddingRight: 10 },
     checkbox: {
         width: 24,
         height: 24,
@@ -197,10 +215,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#fff',
     },
-    checkedCheckbox: {
-        backgroundColor: '#A68B69',
-        borderColor: '#A68B69',
-    },
+    checkedCheckbox: { backgroundColor: '#A68B69', borderColor: '#A68B69' },
     cartItemImage: {
         width: 80,
         height: 80,
@@ -208,9 +223,7 @@ const styles = StyleSheet.create({
         marginRight: 15,
         resizeMode: 'contain',
     },
-    cartItemDetails: {
-        flex: 1,
-    },
+    cartItemDetails: { flex: 1 },
     cartItemName: {
         fontFamily: 'Montserrat_600SemiBold',
         fontSize: 16,
@@ -228,15 +241,15 @@ const styles = StyleSheet.create({
         color: '#A68B69',
         marginTop: 5,
     },
+
+    // Quantity & Remove
     quantityContainer: {
         flexDirection: 'column',
         alignItems: 'flex-end',
         justifyContent: 'space-between',
         height: 80,
     },
-    trashIcon: {
-        marginBottom: 10,
-    },
+    trashIcon: { marginBottom: 10 },
     quantityControl: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -244,17 +257,17 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         overflow: 'hidden',
     },
-    quantityButton: {
-        padding: 8,
-    },
+    quantityButton: { padding: 8 },
     quantityText: {
         fontFamily: 'Montserrat_600SemiBold',
         fontSize: 14,
         paddingHorizontal: 10,
     },
+
+    // Bottom Bar
     bottomBar: {
         position: 'absolute',
-        bottom: 60, 
+        bottom: 60,
         left: 0,
         right: 0,
         flexDirection: 'row',
@@ -271,20 +284,14 @@ const styles = StyleSheet.create({
         shadowRadius: 5,
         elevation: 10,
     },
-    selectAllContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
+    selectAllContainer: { flexDirection: 'row', alignItems: 'center' },
     selectAllText: {
         fontFamily: 'Montserrat_400Regular',
         fontSize: 14,
         color: '#000',
         marginLeft: 8,
     },
-    totalContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
+    totalContainer: { flexDirection: 'row', alignItems: 'center' },
     totalAmountText: {
         fontFamily: 'LeagueSpartan_700Bold',
         fontSize: 18,
@@ -302,7 +309,5 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#fff',
     },
-    disabledButton: {
-        backgroundColor: '#D9D9D9',
-    },
+    disabledButton: { backgroundColor: '#D9D9D9' },
 });

@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 // Import screens
 import SplashScreen from "../screens/SplashScreen";
+import OnboardingScreen from "../screens/OnboardingScreen";
 import WelcomeScreen from "../screens/WelcomeScreen";
 import SignInScreen from "../screens/SignInScreen";
 import CreateAccountScreen from '../screens/CreateAccountScreen';
@@ -20,7 +21,6 @@ import ChatbotScreen from "../screens/ChatbotScreen";
 import CheckoutScreen from "../screens/CheckoutScreen";
 import MyOrderScreen from "../screens/MyOrderScreen";
 
-
 const Stack = createNativeStackNavigator();
 
 export default function StackNavigator() {
@@ -30,6 +30,7 @@ export default function StackNavigator() {
       screenOptions={{ headerShown: false }}
     >
       <Stack.Screen name="Splash" component={SplashScreen} />
+      <Stack.Screen name="OnboardingScreen" component={OnboardingScreen} />
       <Stack.Screen name="Welcome" component={WelcomeScreen} />
       <Stack.Screen name="SignIn" component={SignInScreen} />
       <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />

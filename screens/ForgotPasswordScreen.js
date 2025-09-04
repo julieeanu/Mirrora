@@ -1,8 +1,23 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, Platform, ActivityIndicator, Modal } from 'react-native';
+import { 
+    View, 
+    Text, 
+    StyleSheet, 
+    TextInput, 
+    TouchableOpacity, 
+    ScrollView, 
+    Alert, 
+    Platform, 
+    ActivityIndicator, 
+    Modal 
+} from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_600SemiBold } from "@expo-google-fonts/montserrat";
+import { 
+    useFonts as useMontserrat, 
+    Montserrat_400Regular, 
+    Montserrat_600SemiBold 
+} from "@expo-google-fonts/montserrat";
 
 // --- Firebase Imports ---
 import { auth } from '../Backend/firebaseConfig';

@@ -1,14 +1,26 @@
 // screens/SplashScreen.js
 import React, { useEffect } from 'react';
 import { View, ImageBackground, Image, StyleSheet, Dimensions } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SplashScreen = ({ navigation }) => {
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.replace('Welcome');
-    }, 3000); // show splash for 3 seconds
+    const checkFirstLaunch = async () => {
+      const isFirstLaunch = await AsyncStorage.getItem('hasLaunched');
 
-    return () => clearTimeout(timer);
+      setTimeout(async () => {
+        if (isFirstLaunch === null) {
+          // First time launch → show onboarding
+          await AsyncStorage.setItem('hasLaunched', 'true');
+          navigation.replace('OnboardingScreen');
+        } else {
+          // Not first time → go straight to Welcome
+          navigation.replace('OnboardingScreen');
+        }
+      }, 3000); // splash visible for 3 seconds
+    };
+
+    checkFirstLaunch();
   }, [navigation]);
 
   return (

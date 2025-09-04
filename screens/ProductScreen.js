@@ -1,5 +1,14 @@
 import React, { useState } from 'react'; // Import useState
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native'; // Import Modal and TextInput
+import { 
+    View, 
+    Text, 
+    StyleSheet, 
+    Image, 
+    TouchableOpacity, 
+    ScrollView, 
+    Modal, 
+    TextInput 
+} from 'react-native'; // Import Modal and TextInput
 import { useRoute, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
