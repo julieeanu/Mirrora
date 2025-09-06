@@ -8,7 +8,6 @@ import WelcomeScreen from "../screens/WelcomeScreen";
 import SignInScreen from "../screens/SignInScreen";
 import CreateAccountScreen from '../screens/CreateAccountScreen';
 import CompleteProfileScreen from "../screens/CompleteProfileScreen";
-import ForgotPasswordScreen from "../screens/ForgotPasswordScreen"; 
 import HomeScreen from '../screens/HomeScreen';
 import ProductScreen from '../screens/ProductScreen';
 import ProductListScreen from "../screens/ProductListScreen";
@@ -20,6 +19,9 @@ import ProfileScreen from "../screens/ProfileScreen";
 import ChatbotScreen from "../screens/ChatbotScreen";
 import CheckoutScreen from "../screens/CheckoutScreen";
 import MyOrderScreen from "../screens/MyOrderScreen";
+import TrackOrderScreen from "../screens/TrackOrderScreen";
+import SettingsScreen from "../screens/SettingsScreen";
+import MyAddressScreen from "../screens/MyAddressScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -35,7 +37,6 @@ export default function StackNavigator() {
       <Stack.Screen name="SignIn" component={SignInScreen} />
       <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
       <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} />
-      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="ProductScreen" component={ProductScreen} />
       <Stack.Screen name="ProductListScreen" component={ProductListScreen} />
@@ -47,6 +48,9 @@ export default function StackNavigator() {
       <Stack.Screen name="ChatbotScreen" component={ChatbotScreen} />
       <Stack.Screen name="CheckoutScreen" component={CheckoutScreen} />
       <Stack.Screen name="MyOrderScreen" component={MyOrderScreen} />
+      <Stack.Screen name="TrackOrderScreen" component={TrackOrderScreen} />
+      <Stack.Screen name="SettingsScreen" component={SettingsScreen} />
+      <Stack.Screen name="MyAddressScreen" component={MyAddressScreen} />
     </Stack.Navigator>
   );
 }

@@ -14,7 +14,7 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
 
 // --- Firebase Imports ---
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 // CORRECTED PATH: Point to the backend folder
 import { auth } from '../Backend/firebaseConfig'; 
 
@@ -23,15 +23,12 @@ import { useFonts as useMontserrat, Montserrat_400Regular, Montserrat_700Bold } 
 import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-google-fonts/league-spartan";
 
 export default function SignInScreen() {
-  // --- State for inputs ---
+  const [currentScreen, setCurrentScreen] = useState('signIn');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
-
-  // State to track which input is currently focused
   const [focusedInput, setFocusedInput] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  // State to control and customize the custom alert modal
   const [modalMessage, setModalMessage] = useState(null);
   const navigation = useNavigation();
 
@@ -66,7 +63,6 @@ export default function SignInScreen() {
     </Modal>
   );
 
-  // --- Handle Sign In ---
   const handleSignIn = async () => {
     setIsLoading(true);
 
@@ -83,8 +79,6 @@ export default function SignInScreen() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      // On success, the onAuthStateChanged listener in your App.js
-      // will handle navigation to the 'Home' screen automatically.
       navigation.navigate('Home');
     } catch (error) {
       setModalMessage({
@@ -99,13 +93,46 @@ export default function SignInScreen() {
     }
   };
 
-  return (
+  const handlePasswordReset = async () => {
+    setIsLoading(true);
+
+    if (!email) {
+      setModalMessage({
+        title: 'Missing Email',
+        message: 'Please enter your email address to reset your password.',
+        icon: 'alert-circle-outline',
+        iconColor: '#FFC107',
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setModalMessage({
+        title: 'Email Sent!',
+        message: 'A password reset link has been sent to your email. Please check your inbox.',
+        icon: 'check-circle-outline',
+        iconColor: '#7a5c3d',
+      });
+    } catch (error) {
+      setModalMessage({
+        title: 'Error',
+        message: 'Failed to send password reset email. Please check the email address and try again.',
+        icon: 'close-circle',
+        iconColor: '#A68B69',
+      });
+      console.error("Firebase password reset error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const renderSignInScreen = () => (
     <View style={styles.container}>
       <Image source={require("../assets/header.png")} style={styles.topImage} />
-
       <Text style={styles.title}>Sign In</Text>
-      <Text style={styles.subtitle}>Hi! Welcome back, you’ve been missed</Text>
-
+      <Text style={styles.subtitle}>Hi! Welcome back, you've been missed</Text>
       <View style={[
         styles.inputContainer,
         focusedInput === 'email' && styles.focusedInputContainer
@@ -122,7 +149,6 @@ export default function SignInScreen() {
           onBlur={() => setFocusedInput(null)}
         />
       </View>
-
       <View style={[
         styles.inputContainer,
         focusedInput === 'password' && styles.focusedInputContainer
@@ -145,11 +171,9 @@ export default function SignInScreen() {
           />
         </TouchableOpacity>
       </View>
-
-      <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
+      <TouchableOpacity onPress={() => setCurrentScreen('forgotPassword')}>
         <Text style={styles.forgotText}>Forgot Password?</Text>
       </TouchableOpacity>
-
       <TouchableOpacity
         style={styles.signInButton}
         onPress={handleSignIn}
@@ -161,9 +185,8 @@ export default function SignInScreen() {
           <Text style={styles.signInText}>Sign In</Text>
         )}
       </TouchableOpacity>
-
       <Text style={[styles.signupText, { color: "black" }]}>
-        Don’t have an account?{" "}
+        Don't have an account?{" "}
         <Text
           style={[styles.signupLink, { textDecorationLine: "underline" }]}
           onPress={() => navigation.navigate("CreateAccount")}
@@ -171,7 +194,76 @@ export default function SignInScreen() {
           Sign Up
         </Text>
       </Text>
+    </View>
+  );
 
+  const renderForgotPasswordScreen = () => (
+    <View style={styles.forgotPasswordContainer}>
+      {/* Header with back button */}
+      <View style={styles.forgotPasswordHeader}>
+        <TouchableOpacity onPress={() => setCurrentScreen('signIn')} style={styles.backButton}>
+          <Icon name="chevron-left" size={28} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.forgotPasswordHeaderTitle}>Forgot Password</Text>
+      </View>
+
+      {/* Main content */}
+      <View style={styles.forgotPasswordContent}>
+        {/* Email icon container */}
+        <View style={styles.emailIconContainer}>
+          <View style={styles.emailIconCircle}>
+            <Icon name="email-outline" size={60} color="#666" />
+          </View>
+        </View>
+
+        {/* Title and subtitle */}
+        <Text style={styles.forgotPasswordTitle}>Please Verify Your Email Address</Text>
+        <Text style={styles.forgotPasswordSubtitle}>
+          We will send a verification link to your email address{'\n'}
+          to reset your password. Please verify your email.
+        </Text>
+
+        {/* Email input */}
+        <View style={styles.forgotPasswordInputSection}>
+          <Text style={styles.forgotPasswordInputLabel}>Enter email</Text>
+          <View style={[
+            styles.forgotPasswordInputContainer,
+            focusedInput === 'email' && styles.forgotPasswordFocusedInput
+          ]}>
+            <Icon name="email-outline" size={20} color="#999" style={styles.forgotPasswordInputIcon} />
+            <TextInput
+              style={styles.forgotPasswordInputField}
+              placeholder="Enter address"
+              placeholderTextColor="#999"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              onFocus={() => setFocusedInput('email')}
+              onBlur={() => setFocusedInput(null)}
+            />
+          </View>
+        </View>
+
+        {/* Send button */}
+        <TouchableOpacity
+          style={styles.forgotPasswordSendButton}
+          onPress={handlePasswordReset}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.forgotPasswordSendText}>Send</Text>
+          )}
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  return (
+    <View style={{ flex: 1 }}>
+      {currentScreen === 'signIn' ? renderSignInScreen() : renderForgotPasswordScreen()}
       {modalMessage && (
         <MessageModal
           title={modalMessage.title}
@@ -309,5 +401,142 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontFamily: 'Montserrat_700Bold',
     fontSize: 16,
+  },
+
+  // Success Modal Styles
+  successModalView: {
+    backgroundColor: '#A68B69',
+  },
+  successIconContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  successModalTitle: {
+    color: '#fff',
+    fontSize: 20,
+    marginBottom: 10,
+  },
+  successModalText: {
+    color: '#fff',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  successModalButton: {
+    backgroundColor: '#fff',
+  },
+  successModalButtonText: {
+    color: '#A68B69',
+  },
+
+  // New Forgot Password Screen Styles
+  forgotPasswordContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  forgotPasswordHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 50,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  backButton: {
+    marginRight: 15,
+  },
+  forgotPasswordHeaderTitle: {
+    fontSize: 18,
+    fontFamily: 'Montserrat_600SemiBold',
+    color: '#000',
+    flex: 1,
+    textAlign: 'center',
+    marginRight: 43, // Offset for back button to center the title
+  },
+  forgotPasswordContent: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 30,
+    paddingTop: 40,
+  },
+  emailIconContainer: {
+    marginBottom: 40,
+  },
+  emailIconCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  forgotPasswordTitle: {
+    fontSize: 24,
+    fontFamily: 'LeagueSpartan_700Bold',
+    color: '#000',
+    textAlign: 'center',
+    marginBottom: 15,
+  },
+  forgotPasswordSubtitle: {
+    fontSize: 13,
+    fontFamily: 'Montserrat_400Regular',
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 18,
+    marginBottom: 40,
+  },
+  forgotPasswordInputSection: {
+    width: '100%',
+    marginBottom: 40,
+  },
+  forgotPasswordInputLabel: {
+    fontSize: 14,
+    fontFamily: 'Montserrat_400Regular',
+    color: '#333',
+    marginBottom: 8,
+  },
+  forgotPasswordInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    height: 50,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  forgotPasswordFocusedInput: {
+    borderColor: '#A68B69',
+  },
+  forgotPasswordInputIcon: {
+    marginRight: 10,
+  },
+  forgotPasswordInputField: {
+    flex: 1,
+    fontFamily: 'Montserrat_400Regular',
+    fontSize: 16,
+    color: '#000',
+  },
+  forgotPasswordSendButton: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#A68B69',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  forgotPasswordSendText: {
+    color: '#fff',
+    fontSize: 18,
+    fontFamily: 'Montserrat_700Bold',
   },
 });
