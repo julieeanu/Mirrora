@@ -7,8 +7,9 @@ import {
     TouchableOpacity, 
     ScrollView, 
     Platform,
-    Modal,  // Import Modal
-    TextInput, // Import TextInput for the form
+    Modal,
+    TextInput,
+    SafeAreaView,
 } from 'react-native';
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -18,7 +19,7 @@ import { useFonts as useLeagueSpartan, LeagueSpartan_700Bold } from "@expo-googl
 export default function MyAddressScreen() {
     const navigation = useNavigation();
     const [addresses, setAddresses] = useState([]);
-    const [showAddAddressModal, setShowAddAddressModal] = useState(false); // New state for modal visibility
+    const [showAddAddressModal, setShowAddAddressModal] = useState(false);
 
     // State for form inputs inside the modal
     const [fullName, setFullName] = useState('');
@@ -74,7 +75,7 @@ export default function MyAddressScreen() {
                     </Text>
                     <TouchableOpacity 
                         style={styles.addButton}
-                        onPress={() => setShowAddAddressModal(true)} // Open the modal on press
+                        onPress={() => setShowAddAddressModal(true)}
                     >
                         <Text style={styles.addButtonText}>Add Deliver Address</Text>
                     </TouchableOpacity>
@@ -86,71 +87,100 @@ export default function MyAddressScreen() {
                 </ScrollView>
             )}
 
-            {/* Modal for adding a new address */}
+            {/* Full Screen Modal for adding a new address */}
             <Modal
-                animationType="slide" // Slide animation for a smooth transition
-                transparent={true}
+                animationType="slide"
+                transparent={false}
                 visible={showAddAddressModal}
                 onRequestClose={() => setShowAddAddressModal(false)}
             >
-                <View style={styles.modalOverlay}>
-                    <View style={styles.modalView}>
-                        {/* Modal Header */}
-                        <View style={styles.modalHeader}>
-                            <TouchableOpacity onPress={() => setShowAddAddressModal(false)}>
-                                <Icon name="close" size={28} color="#000" />
-                            </TouchableOpacity>
-                            <Text style={styles.modalTitle}>Add Address</Text>
-                            <View style={{ width: 28 }} />
-                        </View>
-                        
-                        {/* Modal Form */}
-                        <ScrollView contentContainerStyle={styles.modalContent}>
-                            <View style={styles.formSection}>
+                <SafeAreaView style={styles.modalContainer}>
+                    {/* Modal Header with Brown Background */}
+                    <View style={styles.modalHeader}>
+                        <TouchableOpacity 
+                            onPress={() => setShowAddAddressModal(false)}
+                            style={styles.backButton}
+                        >
+                            <Icon name="chevron-left" size={28} color="#fff" />
+                        </TouchableOpacity>
+                        <Text style={styles.modalHeaderTitle}>Add Address</Text>
+                        <View style={{ width: 28 }} />
+                    </View>
+                    
+                    {/* Modal Content with White Background */}
+                    <View style={styles.modalContent}>
+                        <ScrollView 
+                            style={styles.formScrollView}
+                            contentContainerStyle={styles.formScrollContent}
+                            showsVerticalScrollIndicator={false}
+                        >
+                            {/* Form Fields */}
+                            <View style={styles.inputContainer}>
                                 <Text style={styles.inputLabel}>Full Name*</Text>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Enter full name"
+                                    placeholder=""
                                     value={fullName}
                                     onChangeText={setFullName}
+                                    placeholderTextColor="#999"
                                 />
+                            </View>
+
+                            <View style={styles.inputContainer}>
                                 <Text style={styles.inputLabel}>Phone Number*</Text>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Enter phone number"
+                                    placeholder=""
                                     keyboardType="phone-pad"
                                     value={phoneNumber}
                                     onChangeText={setPhoneNumber}
+                                    placeholderTextColor="#999"
                                 />
+                            </View>
+
+                            <View style={styles.inputContainer}>
                                 <Text style={styles.inputLabel}>Complete Address*</Text>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Enter complete address"
+                                    placeholder=""
                                     value={completeAddress}
                                     onChangeText={setCompleteAddress}
+                                    placeholderTextColor="#999"
                                 />
+                            </View>
+
+                            <View style={styles.inputContainer}>
                                 <Text style={styles.inputLabel}>Landmark*</Text>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Enter landmark"
+                                    placeholder=""
                                     value={landmark}
                                     onChangeText={setLandmark}
+                                    placeholderTextColor="#999"
                                 />
+                            </View>
+
+                            <View style={styles.inputContainer}>
                                 <Text style={styles.inputLabel}>Postal Code*</Text>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Enter postal code"
+                                    placeholder=""
                                     keyboardType="number-pad"
                                     value={postalCode}
                                     onChangeText={setPostalCode}
+                                    placeholderTextColor="#999"
                                 />
                             </View>
+                        </ScrollView>
+
+                        {/* Save Button */}
+                        <View style={styles.buttonContainer}>
                             <TouchableOpacity style={styles.saveButton} onPress={handleSaveAddress}>
                                 <Text style={styles.saveButtonText}>Add new address</Text>
                             </TouchableOpacity>
-                        </ScrollView>
+                        </View>
                     </View>
-                </View>
+                </SafeAreaView>
             </Modal>
         </View>
     );
@@ -221,65 +251,67 @@ const styles = StyleSheet.create({
     listContainer: {
         padding: 20,
     },
-    // --- Modal Styles ---
-    modalOverlay: {
+    // --- Updated Modal Styles to Match Design ---
+    modalContainer: {
         flex: 1,
-        justifyContent: 'flex-end',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    },
-    modalView: {
-        width: '100%',
-        height: '80%', // Adjust the height as needed
-        backgroundColor: 'white',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        padding: 20,
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
+        backgroundColor: '#A68B69',
     },
     modalHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        width: '100%',
+        paddingHorizontal: 20,
+        paddingTop: Platform.OS === 'android' ? 50 : 0,
         paddingBottom: 15,
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+        backgroundColor: '#A68B69',
     },
-    modalTitle: {
+    backButton: {
+        width: 28,
+        alignItems: 'flex-start',
+    },
+    modalHeaderTitle: {
         fontFamily: 'Montserrat_600SemiBold',
-        fontSize: 22,
-        color: '#000',
+        fontSize: 18,
+        color: '#fff',
+        flex: 1,
+        textAlign: 'center',
     },
     modalContent: {
-        width: '100%',
-        paddingTop: 20,
-        alignItems: 'center',
-    },
-    formSection: {
-        width: '100%',
+        flex: 1,
         backgroundColor: '#fff',
-        borderRadius: 15,
-        padding: 20,
-        marginBottom: 20,
+        borderTopLeftRadius: 25,
+        borderTopRightRadius: 25,
+        paddingTop: 30,
+    },
+    formScrollView: {
+        flex: 1,
+        paddingHorizontal: 30,
+    },
+    formScrollContent: {
+        paddingBottom: 20,
+    },
+    inputContainer: {
+        marginBottom: 30,
     },
     inputLabel: {
-        fontFamily: 'Montserrat_600SemiBold',
-        fontSize: 14,
-        color: '#A68B69',
-        marginBottom: 5,
+        fontFamily: 'Montserrat_400Regular',
+        fontSize: 16,
+        color: '#999',
+        marginBottom: 8,
     },
     input: {
         fontFamily: 'Montserrat_400Regular',
         fontSize: 16,
-        paddingVertical: 10,
+        color: '#000',
+        paddingVertical: 12,
+        paddingHorizontal: 0,
         borderBottomWidth: 1,
         borderBottomColor: '#E0E0E0',
-        marginBottom: 20,
+    },
+    buttonContainer: {
+        paddingHorizontal: 30,
+        paddingVertical: 20,
+        paddingBottom: Platform.OS === 'ios' ? 30 : 20,
     },
     saveButton: {
         width: "100%",
@@ -289,14 +321,14 @@ const styles = StyleSheet.create({
         alignItems: "center",
         borderRadius: 25,
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.4,
-        shadowRadius: 6,
-        elevation: 10,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
     saveButtonText: {
         color: '#fff',
         fontFamily: 'Montserrat_600SemiBold',
-        fontSize: 18,
+        fontSize: 16,
     },
 });

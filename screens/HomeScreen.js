@@ -104,9 +104,6 @@ export default function HomeScreen() {
             {/* Header Section */}
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Mirrora Philippines</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('MessageScreen')}>
-                    <Icon name="chat-processing" size={24} color="#A68B69" />
-                </TouchableOpacity>
             </View>
 
             {/* Search Bar Section */}
@@ -119,8 +116,8 @@ export default function HomeScreen() {
                         placeholderTextColor="#777"
                     />
                 </View>
-                <TouchableOpacity style={styles.filterButton}>
-                    <Icon name="tune" size={24} color="#000" />
+                <TouchableOpacity onPress={() => navigation.navigate('MessageScreen')}>
+                    <Icon name="chat-processing" size={25} color="#A68B69" />
                 </TouchableOpacity>
             </View>
 
@@ -249,6 +246,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#F3F4F6',
         borderRadius: 10,
         paddingHorizontal: 15,
+        marginRight: 10, // Added to create space between the search bar and the icon
     },
     searchIcon: {
         marginRight: 10,
@@ -257,12 +255,6 @@ const styles = StyleSheet.create({
         flex: 1,
         height: 40,
         fontFamily: 'Montserrat_400Regular',
-    },
-    filterButton: {
-        backgroundColor: 'transparent',
-        padding: 8,
-        borderRadius: 10,
-        marginLeft: 10,
     },
     bannerContainer: {
         marginTop: 20,

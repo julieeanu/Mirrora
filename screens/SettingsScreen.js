@@ -34,9 +34,7 @@ const SettingsScreen = () => {
     const [showAccountInfo, setShowAccountInfo] = useState(false);
     const [showPaymentMethodModal, setShowPaymentMethodModal] = useState(false);
     const [showAddCardModal, setShowAddCardModal] = useState(false);
-    // New state for the Appearance modal
-    const [showAppearanceModal, setShowAppearanceModal] = useState(false);
-    
+
     const [currentTab, setCurrentTab] = useState('accountData');
     const [accountEmail, setAccountEmail] = useState(TEMP_USER_DATA.email);
     const [accountPassword, setAccountPassword] = useState(TEMP_USER_DATA.password);
@@ -44,9 +42,6 @@ const SettingsScreen = () => {
     const [accountFirstName, setAccountFirstName] = useState(TEMP_USER_DATA.firstName);
     const [accountLastName, setAccountLastName] = useState(TEMP_USER_DATA.lastName);
     const [accountPhoneNumber, setAccountPhoneNumber] = useState(TEMP_USER_DATA.phoneNumber);
-
-    // New state for the theme mode, default to light
-    const [isDarkTheme, setIsDarkTheme] = useState(false);
 
     // New states for the add card form
     const [cardName, setCardName] = useState('');
@@ -64,40 +59,22 @@ const SettingsScreen = () => {
     }, [montserratLoaded, leagueSpartanLoaded]);
 
     // Function to get theme-aware styles
-    const getStyles = (isDark) => {
-        const lightTheme = {
-            background: '#F5F5F5',
-            surface: '#fff',
-            textPrimary: '#000',
-            textSecondary: '#666',
-            sectionHeader: '#333',
-            separator: '#F0F0F0',
-            inputBorder: '#E8E8E8',
-            saveButton: '#A68B69',
-            deleteButtonBg: '#FFE4E6',
-            deleteButtonText: '#DC2626',
-            iconColor: '#333',
+    const getStyles = () => {
+        const theme = {
+            backgroundPrimary: '#F8F8F8',
+            backgroundSecondary: '#FFFFFF',
+            textPrimary: '#1F2937', // Darker gray for primary text
+            textSecondary: '#6B7280', // Medium gray for secondary text
+            accent: '#C76A51', // Warm Terracotta
+            border: '#E5E7EB', // Lighter gray for borders
+            deleteButtonText: '#EF4444',
+            deleteButtonBg: '#FEE2E2',
         };
-        const darkTheme = {
-            background: '#121212',
-            surface: '#1E1E1E',
-            textPrimary: '#fff',
-            textSecondary: '#B0B0B0',
-            sectionHeader: '#E0E0E0',
-            separator: '#333',
-            inputBorder: '#292929',
-            saveButton: '#A68B69', // Keep the accent color the same
-            deleteButtonBg: '#442C2D',
-            deleteButtonText: '#FF6347',
-            iconColor: '#fff',
-        };
-
-        const theme = isDark ? darkTheme : lightTheme;
 
         return StyleSheet.create({
             safeArea: {
                 flex: 1,
-                backgroundColor: theme.background,
+                backgroundColor: theme.backgroundPrimary,
             },
             container: {
                 flex: 1,
@@ -106,7 +83,7 @@ const SettingsScreen = () => {
                 flex: 1,
                 justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: theme.background,
+                backgroundColor: theme.backgroundPrimary,
             },
             header: {
                 flexDirection: 'row',
@@ -115,9 +92,10 @@ const SettingsScreen = () => {
                 paddingHorizontal: 20,
                 paddingTop: Platform.OS === 'android' ? 50 : 0,
                 paddingBottom: 15,
-                backgroundColor: theme.surface,
-                borderBottomWidth: 1,
-                borderBottomColor: theme.separator,
+                backgroundColor: theme.backgroundPrimary,
+                borderBottomColor: 'transparent',
+                elevation: 0,
+                shadowOpacity: 0,
             },
             backButton: {
                 width: 40,
@@ -128,14 +106,14 @@ const SettingsScreen = () => {
             },
             headerTitle: {
                 fontFamily: 'Montserrat_600SemiBold',
-                fontSize: 18,
+                fontSize: 20,
                 color: theme.textPrimary,
                 flex: 1,
                 textAlign: 'center',
             },
             scrollView: {
                 flex: 1,
-                backgroundColor: theme.background,
+                backgroundColor: theme.backgroundPrimary,
             },
             scrollViewContent: {
                 paddingBottom: 100,
@@ -147,15 +125,27 @@ const SettingsScreen = () => {
             sectionHeader: {
                 fontFamily: 'Montserrat_600SemiBold',
                 fontSize: 16,
-                color: theme.sectionHeader,
+                color: theme.textSecondary,
                 marginBottom: 15,
                 marginTop: 10,
             },
             settingsSection: {
-                backgroundColor: theme.surface,
-                borderRadius: 12,
+                backgroundColor: theme.backgroundSecondary,
+                borderRadius: 20, // Increased corner radius for a softer look
                 marginBottom: 25,
                 overflow: 'hidden',
+                // Added drop shadow for a layered effect
+                ...Platform.select({
+                    ios: {
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 4 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 8,
+                    },
+                    android: {
+                        elevation: 4,
+                    },
+                }),
             },
             settingsItem: {
                 flexDirection: 'row',
@@ -164,7 +154,10 @@ const SettingsScreen = () => {
                 paddingVertical: 18,
                 paddingHorizontal: 20,
                 borderBottomWidth: 1,
-                borderBottomColor: theme.separator,
+                borderBottomColor: theme.border,
+            },
+            settingsItemLast: {
+                borderBottomWidth: 0,
             },
             settingsItemLeft: {
                 flexDirection: 'row',
@@ -182,11 +175,11 @@ const SettingsScreen = () => {
             // Modal specific styles
             modalSafeArea: {
                 flex: 1,
-                backgroundColor: theme.background,
+                backgroundColor: theme.backgroundPrimary,
             },
             modalContainer: {
                 flex: 1,
-                backgroundColor: theme.background,
+                backgroundColor: theme.backgroundPrimary,
             },
             modalHeader: {
                 flexDirection: 'row',
@@ -194,9 +187,9 @@ const SettingsScreen = () => {
                 alignItems: 'center',
                 paddingHorizontal: 16,
                 paddingVertical: 12,
-                backgroundColor: theme.background,
+                backgroundColor: theme.backgroundPrimary,
                 borderBottomWidth: 1,
-                borderBottomColor: theme.inputBorder,
+                borderBottomColor: theme.border,
             },
             modalBackButton: {
                 padding: 4,
@@ -206,31 +199,42 @@ const SettingsScreen = () => {
             },
             modalHeaderTitle: {
                 fontFamily: 'Montserrat_600SemiBold',
-                fontSize: 16,
+                fontSize: 18,
                 color: theme.textPrimary,
                 flex: 1,
                 textAlign: 'center',
             },
             modalScrollView: {
                 flex: 1,
-                backgroundColor: theme.background,
+                backgroundColor: theme.backgroundPrimary,
             },
             tabBar: {
                 flexDirection: 'row',
-                backgroundColor: theme.surface,
+                backgroundColor: theme.backgroundSecondary,
                 marginHorizontal: 16,
                 marginTop: 8,
-                borderRadius: 12,
-                padding: 4,
+                borderRadius: 16,
+                padding: 6,
+                ...Platform.select({
+                    ios: {
+                        shadowColor: '#000',
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.05,
+                        shadowRadius: 4,
+                    },
+                    android: {
+                        elevation: 2,
+                    },
+                }),
             },
             tab: {
                 flex: 1,
                 alignItems: 'center',
-                paddingVertical: 10,
-                borderRadius: 8,
+                paddingVertical: 12,
+                borderRadius: 12,
             },
             activeTab: {
-                backgroundColor: theme.background,
+                backgroundColor: theme.backgroundPrimary,
             },
             tabText: {
                 fontFamily: 'Montserrat_400Regular',
@@ -242,30 +246,29 @@ const SettingsScreen = () => {
                 color: theme.textPrimary,
             },
             tabContent: {
-                paddingHorizontal: 16,
+                paddingHorizontal: 20,
                 paddingTop: 24,
-                backgroundColor: theme.background,
+                backgroundColor: theme.backgroundPrimary,
             },
             inputGroup: {
                 marginBottom: 20,
             },
             label: {
                 fontFamily: 'Montserrat_400Regular',
-                fontSize: 12,
+                fontSize: 13,
                 color: theme.textSecondary,
                 marginBottom: 8,
-                marginLeft: 4,
             },
             input: {
                 fontFamily: 'Montserrat_400Regular',
-                fontSize: 15,
+                fontSize: 16,
                 color: theme.textPrimary,
-                paddingVertical: 14,
-                paddingHorizontal: 16,
-                backgroundColor: theme.surface,
+                paddingVertical: 16,
+                paddingHorizontal: 18,
+                backgroundColor: theme.backgroundSecondary,
                 borderRadius: 12,
                 borderWidth: 1,
-                borderColor: theme.inputBorder,
+                borderColor: theme.border,
             },
             deleteSection: {
                 marginTop: 40,
@@ -279,33 +282,33 @@ const SettingsScreen = () => {
             },
             deleteDescription: {
                 fontFamily: 'Montserrat_400Regular',
-                fontSize: 13,
+                fontSize: 14,
                 color: theme.textSecondary,
                 marginBottom: 20,
-                lineHeight: 18,
+                lineHeight: 20,
             },
             deleteButton: {
                 backgroundColor: theme.deleteButtonBg,
-                paddingVertical: 14,
+                paddingVertical: 16,
                 borderRadius: 12,
                 alignItems: 'center',
             },
             deleteButtonText: {
                 fontFamily: 'Montserrat_600SemiBold',
-                fontSize: 15,
+                fontSize: 16,
                 color: theme.deleteButtonText,
             },
             saveButtonContainer: {
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                backgroundColor: theme.background,
+                paddingHorizontal: 20,
+                paddingVertical: 16,
+                backgroundColor: theme.backgroundPrimary,
                 borderTopWidth: 1,
-                borderTopColor: theme.inputBorder,
+                borderTopColor: theme.border,
             },
             saveButton: {
-                backgroundColor: theme.saveButton,
-                paddingVertical: 14,
-                borderRadius: 12,
+                backgroundColor: theme.accent,
+                paddingVertical: 16,
+                borderRadius: 25, // More rounded, pill-like shape
                 alignItems: 'center',
             },
             saveButtonText: {
@@ -319,31 +322,31 @@ const SettingsScreen = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
                 paddingHorizontal: 20,
-                backgroundColor: theme.background,
+                backgroundColor: theme.backgroundPrimary,
             },
             paymentCardIcon: {
                 marginBottom: 20,
             },
             noCardTitle: {
                 fontFamily: 'Montserrat_600SemiBold',
-                fontSize: 18,
+                fontSize: 20,
                 color: theme.textPrimary,
                 marginBottom: 10,
                 textAlign: 'center',
             },
             noCardDescription: {
                 fontFamily: 'Montserrat_400Regular',
-                fontSize: 14,
+                fontSize: 15,
                 color: theme.textSecondary,
                 textAlign: 'center',
                 marginBottom: 30,
-                lineHeight: 20,
+                lineHeight: 22,
             },
             addCardButton: {
-                backgroundColor: theme.saveButton,
-                paddingVertical: 14,
+                backgroundColor: theme.accent,
+                paddingVertical: 16,
                 paddingHorizontal: 40,
-                borderRadius: 12,
+                borderRadius: 25,
                 alignItems: 'center',
             },
             addCardButtonText: {
@@ -360,45 +363,23 @@ const SettingsScreen = () => {
             cardInfoInputGroup: {
                 width: '48%',
             },
-            // New styles for the Appearance modal
-            themeOption: {
-                flexDirection: 'row',
-                alignItems: 'center',
-                paddingVertical: 18,
-                paddingHorizontal: 20,
-                borderBottomWidth: 1,
-                borderBottomColor: theme.separator,
-            },
-            themeOptionLast: {
-                borderBottomWidth: 0,
-            },
-            themeOptionText: {
-                fontFamily: 'Montserrat_400Regular',
-                fontSize: 16,
-                color: theme.textPrimary,
-                flex: 1,
-            },
-            checkmarkIcon: {
-                marginLeft: 'auto',
-            },
         });
     };
 
-    const themedStyles = getStyles(isDarkTheme);
+    const themedStyles = getStyles();
 
     if (isLoading) {
         return (
             <View style={themedStyles.loadingContainer}>
-                <ActivityIndicator size="large" color="#A68B69" />
+                <ActivityIndicator size="large" color={themedStyles.accent} />
             </View>
         );
     }
 
-    const SettingsItem = ({ icon, title, onPress, hasChevron = true, themeStyles }) => (
-        <TouchableOpacity style={themeStyles.settingsItem} onPress={onPress}>
+    const SettingsItem = ({ icon, title, onPress, hasChevron = true, themeStyles, isLast = false }) => (
+        <TouchableOpacity style={[themeStyles.settingsItem, isLast && themeStyles.settingsItemLast]} onPress={onPress}>
             <View style={themeStyles.settingsItemLeft}>
-                {/* Corrected: pass color string directly */}
-                <Icon name={icon} size={24} color={themeStyles.iconColor} style={themeStyles.settingsItemIcon} />
+                <Icon name={icon} size={24} color={themeStyles.textPrimary} style={themedStyles.settingsItemIcon} />
                 <Text style={themeStyles.settingsItemText}>{title}</Text>
             </View>
             {hasChevron && (
@@ -496,7 +477,6 @@ const SettingsScreen = () => {
             <View style={themedStyles.modalContainer}>
                 <View style={themedStyles.modalHeader}>
                     <TouchableOpacity onPress={() => setShowAddCardModal(false)} style={themedStyles.modalBackButton}>
-                        {/* Corrected: pass color string directly */}
                         <Icon name="chevron-left" size={24} color={themedStyles.textPrimary} />
                     </TouchableOpacity>
                     <Text style={themedStyles.modalHeaderTitle}>Add new card</Text>
@@ -565,53 +545,14 @@ const SettingsScreen = () => {
         );
     };
 
-    const renderAppearanceModalContent = () => {
-        const checkmarkColor = isDarkTheme ? 'white' : 'black';
-        return (
-            <View style={themedStyles.modalContainer}>
-                <View style={themedStyles.modalHeader}>
-                    <TouchableOpacity onPress={() => setShowAppearanceModal(false)} style={themedStyles.modalBackButton}>
-                        {/* Corrected: pass color string directly */}
-                        <Icon name="chevron-left" size={24} color={themedStyles.textPrimary} />
-                    </TouchableOpacity>
-                    <Text style={themedStyles.modalHeaderTitle}>Appearance</Text>
-                    <View style={themedStyles.modalHeaderSpacer} />
-                </View>
-                <ScrollView style={themedStyles.modalScrollView} showsVerticalScrollIndicator={false}>
-                    <View style={[themedStyles.settingsSection, { marginTop: 20 }]}>
-                        <TouchableOpacity 
-                            style={themedStyles.themeOption}
-                            onPress={() => setIsDarkTheme(false)}
-                        >
-                            <Text style={themedStyles.themeOptionText}>Light Mode</Text>
-                            {!isDarkTheme && (
-                                <Icon name="check" size={24} color={checkmarkColor} style={themedStyles.checkmarkIcon} />
-                            )}
-                        </TouchableOpacity>
-                        <TouchableOpacity 
-                            style={[themedStyles.themeOption, themedStyles.themeOptionLast]}
-                            onPress={() => setIsDarkTheme(true)}
-                        >
-                            <Text style={themedStyles.themeOptionText}>Dark Mode</Text>
-                            {isDarkTheme && (
-                                <Icon name="check" size={24} color={checkmarkColor} style={themedStyles.checkmarkIcon} />
-                            )}
-                        </TouchableOpacity>
-                    </View>
-                </ScrollView>
-            </View>
-        );
-    };
-
     return (
         <SafeAreaView style={themedStyles.safeArea}>
             <View style={themedStyles.container}>
-                <StatusBar barStyle={isDarkTheme ? "light-content" : "dark-content"} backgroundColor={isDarkTheme ? '#1E1E1E' : '#fff'} />
-                
+                <StatusBar barStyle={"dark-content"} backgroundColor={'#F8F8F8'} />
+
                 {/* Header */}
                 <View style={themedStyles.header}>
                     <TouchableOpacity onPress={() => navigation.goBack()} style={themedStyles.backButton}>
-                        {/* Corrected: pass color string directly */}
                         <Icon name="chevron-left" size={28} color={themedStyles.textPrimary} />
                     </TouchableOpacity>
                     <Text style={themedStyles.headerTitle}>Settings</Text>
@@ -637,16 +578,11 @@ const SettingsScreen = () => {
                                 themeStyles={themedStyles}
                             />
                             <SettingsItem
-                                icon="palette-outline"
-                                title="Appearance"
-                                onPress={() => setShowAppearanceModal(true)}
-                                themeStyles={themedStyles}
-                            />
-                            <SettingsItem
                                 icon="bell-outline"
                                 title="Notification"
                                 onPress={() => navigation.navigate('Notifications')}
                                 themeStyles={themedStyles}
+                                isLast={true}
                             />
                         </View>
 
@@ -658,6 +594,7 @@ const SettingsScreen = () => {
                                 title="Help Center"
                                 onPress={() => navigation.navigate('HelpCenter')}
                                 themeStyles={themedStyles}
+                                isLast={true}
                             />
                         </View>
                     </View>
@@ -671,12 +608,11 @@ const SettingsScreen = () => {
                     onRequestClose={() => setShowAccountInfo(false)}
                 >
                     <SafeAreaView style={themedStyles.modalSafeArea}>
-                        <StatusBar barStyle={isDarkTheme ? "light-content" : "dark-content"} backgroundColor={isDarkTheme ? '#121212' : '#F5F5F5'} />
+                        <StatusBar barStyle={"dark-content"} backgroundColor={'#F8F8F8'} />
                         <View style={themedStyles.modalContainer}>
                             {/* Modal Header */}
                             <View style={themedStyles.modalHeader}>
                                 <TouchableOpacity onPress={() => setShowAccountInfo(false)} style={themedStyles.modalBackButton}>
-                                    {/* Corrected: pass color string directly */}
                                     <Icon name="chevron-left" size={24} color={themedStyles.textPrimary} />
                                 </TouchableOpacity>
                                 <Text style={themedStyles.modalHeaderTitle}>Account Information</Text>
@@ -724,34 +660,23 @@ const SettingsScreen = () => {
                     onRequestClose={() => setShowPaymentMethodModal(false)}
                 >
                     <SafeAreaView style={themedStyles.modalSafeArea}>
-                        <StatusBar barStyle={isDarkTheme ? "light-content" : "dark-content"} backgroundColor={isDarkTheme ? '#121212' : '#F5F5F5'} />
+                        <StatusBar barStyle={"dark-content"} backgroundColor={'#F8F8F8'} />
                         <View style={themedStyles.modalContainer}>
-                            {/* Modal Header */}
                             <View style={themedStyles.modalHeader}>
                                 <TouchableOpacity onPress={() => setShowPaymentMethodModal(false)} style={themedStyles.modalBackButton}>
-                                    {/* Corrected: pass color string directly */}
                                     <Icon name="chevron-left" size={24} color={themedStyles.textPrimary} />
                                 </TouchableOpacity>
                                 <Text style={themedStyles.modalHeaderTitle}>Payment Methods</Text>
                                 <View style={themedStyles.modalHeaderSpacer} />
                             </View>
-
-                            {/* Payment Content */}
-                            {/* This is a simple placeholder. You would map through a list of cards here. */}
                             <View style={themedStyles.paymentMethodContent}>
-                                <Icon name="credit-card-remove-outline" size={80} color={themedStyles.textSecondary} style={themedStyles.paymentCardIcon} />
-                                <Text style={themedStyles.noCardTitle}>No cards added yet</Text>
+                                <Icon name="credit-card-off-outline" size={72} color={themedStyles.textSecondary} style={themedStyles.paymentCardIcon} />
+                                <Text style={themedStyles.noCardTitle}>No cards yet!</Text>
                                 <Text style={themedStyles.noCardDescription}>
-                                    Add a credit or debit card to make payments in the application.
+                                    Looks like you haven't added any payment methods yet. Add a card to make purchases.
                                 </Text>
-                                <TouchableOpacity
-                                    style={themedStyles.addCardButton}
-                                    onPress={() => {
-                                        setShowPaymentMethodModal(false);
-                                        setShowAddCardModal(true);
-                                    }}
-                                >
-                                    <Text style={themedStyles.addCardButtonText}>Add new card</Text>
+                                <TouchableOpacity style={themedStyles.addCardButton} onPress={() => { setShowPaymentMethodModal(false); setShowAddCardModal(true); }}>
+                                    <Text style={themedStyles.addCardButtonText}>Add a card</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -766,33 +691,16 @@ const SettingsScreen = () => {
                     onRequestClose={() => setShowAddCardModal(false)}
                 >
                     <SafeAreaView style={themedStyles.modalSafeArea}>
-                        <StatusBar barStyle={isDarkTheme ? "light-content" : "dark-content"} backgroundColor={isDarkTheme ? '#121212' : '#F5F5F5'} />
+                        <StatusBar barStyle={"dark-content"} backgroundColor={'#F8F8F8'} />
                         {renderAddCardModalContent()}
                     </SafeAreaView>
                 </Modal>
 
-                {/* Appearance Modal */}
-                <Modal
-                    animationType="slide"
-                    transparent={false}
-                    visible={showAppearanceModal}
-                    onRequestClose={() => setShowAppearanceModal(false)}
-                >
-                    <SafeAreaView style={themedStyles.modalSafeArea}>
-                        <StatusBar barStyle={isDarkTheme ? "light-content" : "dark-content"} backgroundColor={isDarkTheme ? '#121212' : '#F5F5F5'} />
-                        {renderAppearanceModalContent()}
-                    </SafeAreaView>
-                </Modal>
-                
                 {/* Bottom Navigation Bar */}
-                <BottomNavigationBar />
+                <BottomNavigationBar isDarkTheme={false} />
             </View>
         </SafeAreaView>
     );
 };
-
-const commonStyles = StyleSheet.create({
-    // You can define some common styles here if needed
-});
 
 export default SettingsScreen;
